@@ -4,12 +4,21 @@
 #else
 #include <intrin.h>
 #endif
-
 #include "AVX.h"
+
+#ifdef _OPENMP
+#include <omp.h>
+#define TH_OMP_OVERHEAD_THRESHOLD 100000
+#endif
+
+#include<stdio.h>
 
 void THDoubleVector_copy_AVX(double *y, const double *x, const ptrdiff_t n) {
   ptrdiff_t i;
   ptrdiff_t off;
+#ifdef _OPENMP
+  #pragma omp parallel for if (n > TH_OMP_OVERHEAD_THRESHOLD) private (i)  
+#endif
   for (i=0; i<=((n)-8); i+=8) {
     _mm256_storeu_pd(y+i, _mm256_loadu_pd(x+i));
     _mm256_storeu_pd(y+i+4, _mm256_loadu_pd(x+i+4));
@@ -24,6 +33,9 @@ void THDoubleVector_fill_AVX(double *x, const double c, const ptrdiff_t n) {
   ptrdiff_t i;
   ptrdiff_t off;
   __m256d YMM0 = _mm256_set_pd(c, c, c, c);
+#ifdef _OPENMP
+  #pragma omp parallel for if (n > TH_OMP_OVERHEAD_THRESHOLD) private (i)  
+#endif
   for (i=0; i<=((n)-16); i+=16) {
     _mm256_storeu_pd((x)+i  , YMM0);
     _mm256_storeu_pd((x)+i+4, YMM0);
@@ -39,6 +51,9 @@ void THDoubleVector_fill_AVX(double *x, const double c, const ptrdiff_t n) {
 void THDoubleVector_cdiv_AVX(double *z, const double *x, const double *y, const ptrdiff_t n) {
   ptrdiff_t i;
   __m256d YMM0, YMM1, YMM2, YMM3;
+#ifdef _OPENMP
+  #pragma omp parallel for if (n > TH_OMP_OVERHEAD_THRESHOLD) private (i)  
+#endif
   for (i=0; i<=((n)-8); i+=8) {
     YMM0 = _mm256_loadu_pd(x+i);
     YMM1 = _mm256_loadu_pd(x+i+4);
@@ -58,6 +73,9 @@ void THDoubleVector_divs_AVX(double *y, const double *x, const double c, const p
   ptrdiff_t i;
   __m256d YMM15 = _mm256_set_pd(c, c, c, c);
   __m256d YMM0, YMM1;
+#ifdef _OPENMP
+  #pragma omp parallel for if (n > TH_OMP_OVERHEAD_THRESHOLD) private (i)  
+#endif
   for (i=0; i<=((n)-8); i+=8) {
     YMM0 = _mm256_loadu_pd(x+i);
     YMM1 = _mm256_loadu_pd(x+i+4);
@@ -74,6 +92,9 @@ void THDoubleVector_divs_AVX(double *y, const double *x, const double c, const p
 void THDoubleVector_cmul_AVX(double *z, const double *x, const double *y, const ptrdiff_t n) {
   ptrdiff_t i;
   __m256d YMM0, YMM1, YMM2, YMM3;
+#ifdef _OPENMP
+  #pragma omp parallel for if (n > TH_OMP_OVERHEAD_THRESHOLD) private (i)  
+#endif
   for (i=0; i<=((n)-8); i+=8) {
     YMM0 = _mm256_loadu_pd(x+i);
     YMM1 = _mm256_loadu_pd(x+i+4);
@@ -93,6 +114,9 @@ void THDoubleVector_muls_AVX(double *y, const double *x, const double c, const p
   ptrdiff_t i;
   __m256d YMM15 = _mm256_set_pd(c, c, c, c);
   __m256d YMM0, YMM1;
+#ifdef _OPENMP
+  #pragma omp parallel for if (n > TH_OMP_OVERHEAD_THRESHOLD) private (i)  
+#endif
   for (i=0; i<=((n)-8); i+=8) {
     YMM0 = _mm256_loadu_pd(x+i);
     YMM1 = _mm256_loadu_pd(x+i+4);
@@ -110,6 +134,9 @@ void THDoubleVector_cadd_AVX(double *z, const double *x, const double *y, const 
   ptrdiff_t i;
   __m256d YMM15 = _mm256_set_pd(c, c, c, c);
   __m256d YMM0, YMM1, YMM2, YMM3;
+#ifdef _OPENMP
+  #pragma omp parallel for if (n > TH_OMP_OVERHEAD_THRESHOLD) private (i)  
+#endif
   for (i=0; i<=((n)-4); i+=4) {
     YMM0 = _mm256_loadu_pd(y+i);
     YMM1 = _mm256_loadu_pd(x+i);
@@ -126,6 +153,9 @@ void THDoubleVector_adds_AVX(double *y, const double *x, const double c, const p
   ptrdiff_t i;
   __m256d YMM15 = _mm256_set_pd(c, c, c, c);
   __m256d YMM0, YMM1;
+#ifdef _OPENMP
+  #pragma omp parallel for if (n > TH_OMP_OVERHEAD_THRESHOLD) private (i)  
+#endif
   for (i=0; i<=((n)-8); i+=8) {
     YMM0 = _mm256_loadu_pd(x+i);
     YMM1 = _mm256_loadu_pd(x+i+4);
@@ -142,6 +172,9 @@ void THDoubleVector_adds_AVX(double *y, const double *x, const double c, const p
 void THFloatVector_copy_AVX(float *y, const float *x, const ptrdiff_t n) {
   ptrdiff_t i;
   ptrdiff_t off;
+#ifdef _OPENMP
+  #pragma omp parallel for if (n > TH_OMP_OVERHEAD_THRESHOLD) private (i)  
+#endif
   for (i=0; i<=((n)-16); i+=16) {
     _mm256_storeu_ps(y+i, _mm256_loadu_ps(x+i));
     _mm256_storeu_ps(y+i+8, _mm256_loadu_ps(x+i+8));
@@ -156,6 +189,9 @@ void THFloatVector_fill_AVX(float *x, const float c, const ptrdiff_t n) {
   ptrdiff_t i;
   ptrdiff_t off;
   __m256 YMM0 = _mm256_set_ps(c, c, c, c, c, c, c, c);
+#ifdef _OPENMP
+  #pragma omp parallel for if (n > TH_OMP_OVERHEAD_THRESHOLD) private (i)  
+#endif
   for (i=0; i<=((n)-32); i+=32) {
     _mm256_storeu_ps((x)+i  , YMM0);
     _mm256_storeu_ps((x)+i+8, YMM0);
@@ -171,6 +207,9 @@ void THFloatVector_fill_AVX(float *x, const float c, const ptrdiff_t n) {
 void THFloatVector_cdiv_AVX(float *z, const float *x, const float *y, const ptrdiff_t n) {
   ptrdiff_t i;
   __m256 YMM0, YMM1, YMM2, YMM3;
+#ifdef _OPENMP
+  #pragma omp parallel for if (n > TH_OMP_OVERHEAD_THRESHOLD) private (i)  
+#endif
   for (i=0; i<=((n)-16); i+=16) {
     YMM0 = _mm256_loadu_ps(x+i);
     YMM1 = _mm256_loadu_ps(x+i+8);
@@ -190,6 +229,9 @@ void THFloatVector_divs_AVX(float *y, const float *x, const float c, const ptrdi
   ptrdiff_t i;
   __m256 YMM15 = _mm256_set_ps(c, c, c, c, c, c, c, c);
   __m256 YMM0, YMM1;
+#ifdef _OPENMP
+  #pragma omp parallel for if (n > TH_OMP_OVERHEAD_THRESHOLD) private (i)  
+#endif
   for (i=0; i<=((n)-16); i+=16) {
     YMM0 = _mm256_loadu_ps(x+i);
     YMM1 = _mm256_loadu_ps(x+i+8);
@@ -206,6 +248,9 @@ void THFloatVector_divs_AVX(float *y, const float *x, const float c, const ptrdi
 void THFloatVector_cmul_AVX(float *z, const float *x, const float *y, const ptrdiff_t n) {
   ptrdiff_t i;
   __m256 YMM0, YMM1, YMM2, YMM3;
+#ifdef _OPENMP
+  #pragma omp parallel for if (n > TH_OMP_OVERHEAD_THRESHOLD) private (i)  
+#endif
   for (i=0; i<=((n)-16); i+=16) {
     YMM0 = _mm256_loadu_ps(x+i);
     YMM1 = _mm256_loadu_ps(x+i+8);
@@ -225,6 +270,9 @@ void THFloatVector_muls_AVX(float *y, const float *x, const float c, const ptrdi
   ptrdiff_t i;
   __m256 YMM15 = _mm256_set_ps(c, c, c, c, c, c, c, c);
   __m256 YMM0, YMM1;
+#ifdef _OPENMP
+  #pragma omp parallel for if (n > TH_OMP_OVERHEAD_THRESHOLD) private (i)  
+#endif
   for (i=0; i<=((n)-16); i+=16) {
     YMM0 = _mm256_loadu_ps(x+i);
     YMM1 = _mm256_loadu_ps(x+i+8);
@@ -242,6 +290,9 @@ void THFloatVector_cadd_AVX(float *z, const float *x, const float *y, const floa
   ptrdiff_t i;
   __m256 YMM15 = _mm256_set_ps(c, c, c, c, c, c, c, c);
   __m256 YMM0, YMM1, YMM2, YMM3;
+#ifdef _OPENMP
+  #pragma omp parallel for if (n > TH_OMP_OVERHEAD_THRESHOLD) private (i)  
+#endif
   for (i=0; i<=((n)-8); i+=8) {
     YMM0 = _mm256_loadu_ps(y+i);
     YMM1 = _mm256_loadu_ps(x+i);
@@ -258,6 +309,9 @@ void THFloatVector_adds_AVX(float *y, const float *x, const float c, const ptrdi
   ptrdiff_t i;
   __m256 YMM15 = _mm256_set_ps(c, c, c, c, c, c, c, c);
   __m256 YMM0, YMM1;
+#ifdef _OPENMP
+  #pragma omp parallel for if (n > TH_OMP_OVERHEAD_THRESHOLD) private (i)  
+#endif
   for (i=0; i<=((n)-16); i+=16) {
     YMM0 = _mm256_loadu_ps(x+i);
     YMM1 = _mm256_loadu_ps(x+i+8);
