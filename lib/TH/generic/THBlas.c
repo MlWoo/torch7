@@ -2,6 +2,12 @@
 #define TH_GENERIC_FILE "generic/THBlas.c"
 #else
 
+#define BLAS_ALL_LOG     0
+#define GEMM_TOP3_LOG    0
+
+#if BLAS_ALL_LOG | GEMM_TOP3_LOG
+#include <sys/time.h>
+#endif
 
 #ifdef BLAS_F2C
 # define ffloat double
@@ -141,7 +147,16 @@ void THBlas_(axpy)(long n, real a, real *x, long incx, real *y, long incy)
 #if defined(TH_REAL_IS_DOUBLE)
     daxpy_(&i_n, &a, x, &i_incx, y, &i_incy);
 #else
+
+#if BLAS_ALL_LOG
+    struct timeval start,end;gettimeofday(&start,NULL);
     saxpy_(&i_n, &a, x, &i_incx, y, &i_incy);
+    gettimeofday(&end,NULL);
+    double duration = (end.tv_sec - start.tv_sec) * 1000 + (double)(end.tv_usec - start.tv_usec) /1000;
+    printf("saxpy time = %.2f ms, n=%d, a=%.4f, incx=%d, incy=%d \n", duration, i_n,a,i_incx,i_incy);
+#else
+    saxpy_(&i_n, &a, x, &i_incx, y, &i_incy);
+#endif
 #endif
     return;
   }
@@ -204,7 +219,16 @@ void THBlas_(gemv)(char trans, long m, long n, real alpha, real *a, long lda, re
 #if defined(TH_REAL_IS_DOUBLE)
     dgemv_(&trans, &i_m, &i_n, &alpha, a, &i_lda, x, &i_incx, &beta, y, &i_incy);
 #else
+
+#if BLAS_ALL_LOG 
+    struct timeval start,end;gettimeofday(&start,NULL);
     sgemv_(&trans, &i_m, &i_n, &alpha, a, &i_lda, x, &i_incx, &beta, y, &i_incy);
+    gettimeofday(&end,NULL);
+    double duration = (end.tv_sec - start.tv_sec) * 1000 + (double)(end.tv_usec - start.tv_usec) /1000;
+    printf("sgemv time = %.2f ms, trans=%d, m=%d, n=%d, lda=%d, alpha=%.4f, ldb=%d, beta=%.4f, ldc=%d\n", duration,trans,i_m,i_n,i_lda,alpha,i_incx,beta,i_incy);
+#else
+    sgemv_(&trans, &i_m, &i_n, &alpha, a, &i_lda, x, &i_incx, &beta, y, &i_incy);
+#endif
 #endif
     return;
   }
@@ -319,7 +343,42 @@ void THBlas_(gemm)(char transa, char transb, long m, long n, long k, real alpha,
 #if defined(TH_REAL_IS_DOUBLE)
     dgemm_(&transa, &transb, &i_m, &i_n, &i_k, &alpha, a, &i_lda, b, &i_ldb, &beta, c, &i_ldc);
 #else
+#if BLAS_ALL_LOG
+    struct timeval start,end;gettimeofday(&start,NULL);
     sgemm_(&transa, &transb, &i_m, &i_n, &i_k, &alpha, a, &i_lda, b, &i_ldb, &beta, c, &i_ldc);
+    gettimeofday(&end,NULL);
+    double duration = (end.tv_sec - start.tv_sec) * 1000 + (double)(end.tv_usec - start.tv_usec) /1000;
+    printf("sgemm time = %.2f ms, transa=%d, transb=%d, m=%d, n=%d, k=%d, lda=%d, alpha=%.4f, ldb=%d, beta=%.4f, ldc=%d\n", duration,transa,transb,i_m,i_n,i_k,i_lda,alpha,i_ldb,beta,i_ldc);
+#else
+
+#if GEMM_TOP3_LOG
+    int id = 0;
+    if(i_m == 35820 && i_n == 64 && i_k== 500){id = 1;}
+    if(i_m == 500 && i_n == 64 && i_k== 35820){id = 2;}
+    if(i_m == 500 && i_n == 35820 && i_k== 64){id = 3;}
+    if(id != 0){
+        struct timeval start, end;
+        gettimeofday(&start,NULL);
+        printf("size match\n");
+        int i=0;
+        for(i=0; i < 1; i++)
+        {
+          printf(" i=%d",i);
+          sgemm_(&transa, &transb, &i_m, &i_n, &i_k, &alpha, a, &i_lda, b, &i_ldb, &beta, c, &i_ldc);
+        }
+        gettimeofday(&end,NULL);
+        double duration = (float)(end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec) ;
+        printf("\ngemmid = %d, avg time = %.2f us \n",id, duration);
+    }
+    else{
+    sgemm_(&transa, &transb, &i_m, &i_n, &i_k, &alpha, a, &i_lda, b, &i_ldb, &beta, c, &i_ldc);
+    }
+#else
+    sgemm_(&transa, &transb, &i_m, &i_n, &i_k, &alpha, a, &i_lda, b, &i_ldb, &beta, c, &i_ldc);
+#endif //GEMM_TOP3_LOG
+
+#endif //BLAS_ALL_LOG
+
 #endif
     return;
   }
