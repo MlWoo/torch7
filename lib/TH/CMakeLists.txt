@@ -265,7 +265,7 @@ IF(FORCE_AVX512)
   ENDIF(MSVC)
   SET(simd vector/AVX512.c ${simd})
 ENDIF(FORCE_AVX512)
-
+INCLUDE_DIRECTORIES(${PURE_BLAS_INCLUDE_DIR})
 MESSAGE(STATUS "CMAKE_C_FLAGS:    ${CMAKE_C_FLAGS}")
 SET(hdr
   THGeneral.h THHalf.h THAllocator.h THStorage.h THTensor.h THTensorApply.h THBlas.h THMath.h
