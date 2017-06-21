@@ -10,7 +10,6 @@
 #ifdef _OPENMP
 #include <omp.h>
 #define TH_OMP_OVERHEAD_THRESHOLD_VEC 1000
-#define TH_OMP_OVERHEAD_THRESHOLD_VEC 4352
 #endif
 
 void THDoubleVector_copy_AVX(double *y, const double *x, const ptrdiff_t n) {
@@ -18,7 +17,7 @@ void THDoubleVector_copy_AVX(double *y, const double *x, const ptrdiff_t n) {
   ptrdiff_t off;
 #ifdef _OPENMP
   int omp_flag = omp_in_parallel();
-  #pragma omp parallel for if ( (n > TH_OMP_OVERHEAD_THRESHOLD_VEC) && ( 0 == omp_flag) ) private (i) 
+  #pragma omp parallel for if ( (n > TH_OMP_OVERHEAD_THRESHOLD_VEC) && ( 0 == omp_flag) ) private (i)
 #endif
   for (i=0; i<=((n)-4); i+=4) {
     _mm256_storeu_pd(y+i, _mm256_loadu_pd(x+i));
