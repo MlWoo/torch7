@@ -178,7 +178,7 @@
 #define PRAGMA(P) __pragma(P)
 #endif
 
-#define THTENSOR_MAX_DIM 10
+#define THTENSOR_MAX_DIM 64
 #define TH_OMP_OVERHEAD_THRESHOLD_COPY 1000 
 #include <x86intrin.h>
 #define TH_TENSOR_APPLY_REDUCTION_ADVANCED_INDEX(TYPE1, TENSOR1, OPERATION, CODE) \
@@ -194,7 +194,7 @@
         int dim;                                                                  \
         strideSomeDim = 1;                                                        \
         for (dim = TENSOR1##Dim; dim > 0; dim--){                                 \
-          if(0 == TENSOR1->stride[dim])  {                                         \
+          if(0 == TENSOR1->stride[dim-1])  {                                         \
               TENSOR1##StrideContg = 0;                                              \
               break;                                                                \
           }                                                                       \
@@ -260,7 +260,7 @@
     ptrdiff_t strideSomeDim = 1;                                              \
     int dim;                                                                  \
     for (dim = TENSOR2##Dim; dim > 0; dim--){                                 \
-      if(0 == TENSOR2->stride[dim]) {                                         \
+      if(0 == TENSOR2->stride[dim-1]) {                                         \
         TENSOR2##StrideContg = 0;                                             \
         break;                                               \
       }                                                                        \
@@ -270,7 +270,7 @@
                                                                               \
     strideSomeDim = 1;                                                        \
     for (dim = TENSOR1##Dim; dim > 0; dim--){                                 \
-      if(0 == TENSOR1->stride[dim])  {                                         \
+      if(0 == TENSOR1->stride[dim-1])  {                                         \
         TENSOR1##StrideContg = 0;                                              \
         break;                                                                \
       }                                                                       \
@@ -395,7 +395,7 @@
     ptrdiff_t strideSomeDim = 1;                                              \
     int dim;                                                                  \
     for (dim = TENSOR2##Dim; dim > 0; dim--){                                 \
-      if(0 == TENSOR2->stride[dim]) {                                         \
+      if(0 == TENSOR2->stride[dim-1]) {                                         \
         TENSOR2##StrideContg = 0;                                             \
         break;                                               \
       }                                                                        \
@@ -405,7 +405,7 @@
                                                                               \
     strideSomeDim = 1;                                                        \
     for (dim = TENSOR1##Dim; dim > 0; dim--){                                 \
-      if(0 == TENSOR1->stride[dim])  {                                         \
+      if(0 == TENSOR1->stride[dim-1])  {                                         \
         TENSOR1##StrideContg = 0;                                              \
         break;                                                                \
       }                                                                       \
@@ -540,7 +540,7 @@
     ptrdiff_t strideSomeDim = 1;                                              \
     int dim;                                                                  \
     for (dim = TENSOR2##Dim; dim > 0; dim--){                                 \
-      if(0 == TENSOR2->stride[dim]) {                                         \
+      if(0 == TENSOR2->stride[dim-1]) {                                         \
         TENSOR2##StrideContg = 0;                                             \
         break;                                               \
       }                                                                        \
@@ -550,7 +550,7 @@
                                                                               \
     strideSomeDim = 1;                                                        \
     for (dim = TENSOR1##Dim; dim > 0; dim--){                                 \
-      if(0 == TENSOR1->stride[dim])  {                                         \
+      if(0 == TENSOR1->stride[dim-1])  {                                         \
         TENSOR1##StrideContg = 0;                                              \
         break;                                                                \
       }                                                                       \
@@ -574,6 +574,7 @@
           }\
         } else {\
           PRAGMA2( omp parallel for if (SIZE > TH_OMP_OVERHEAD_THRESHOLD_COPY)  )  \
+          PRAGMA2(simd) \
           for (iter = 0; iter < SIZE; iter++) {\
             TYPE2* TENSOR2##_data = tp+iter;\
             TYPE1* TENSOR1##_data = rp+iter;\
@@ -984,7 +985,7 @@
     ptrdiff_t strideSomeDim = 1;                                              \
     int dim;                                                                  \
     for (dim = TENSOR1##Dim; dim > 0; dim--){                                 \
-      if(0 == TENSOR1->stride[dim])  {                                        \
+      if(0 == TENSOR1->stride[dim-1])  {                                        \
         TENSOR1##StrideContg = 0;                                             \
         break;                                                                \
       }                                                                       \
@@ -993,7 +994,7 @@
     }                                                                         \
     strideSomeDim = 1;                                                        \
     for (dim = TENSOR2##Dim; dim > 0; dim--){                                 \
-      if(0 == TENSOR2->stride[dim]) {                                         \
+      if(0 == TENSOR2->stride[dim-1]) {                                         \
         TENSOR2##StrideContg = 0;                                             \
         break;                                                                \
       }                                                                       \
@@ -1002,7 +1003,7 @@
     }                                                                         \
     strideSomeDim = 1;                                                        \
     for (dim = TENSOR3##Dim; dim > 0; dim--){                                 \
-      if(0 == TENSOR3->stride[dim]) {                                         \
+      if(0 == TENSOR3->stride[dim-1]) {                                         \
         TENSOR3##StrideContg = 0;                                             \
         break;                                                                \
       }                                                                       \

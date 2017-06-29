@@ -2111,9 +2111,120 @@ void THTensor_(min)(THTensor *values_, THLongTensor *indices_, THTensor *t, int 
     THLongTensor_squeeze1d(indices_, indices_, dimension);
   }
 }
-
-
 void THTensor_(sum)(THTensor *r_, THTensor *t, int dimension, int keepdim)
+{
+  THLongStorage *dim;
+
+  THArgCheck(dimension >= 0 && dimension < THTensor_(nDimension)(t), 2, "dimension %d out of range",
+      dimension + TH_INDEX_BASE);
+
+  dim = THTensor_(newSizeOf)(t);
+  THLongStorage_set(dim, dimension, 1);
+  THTensor_(resize)(r_, dim, NULL);
+  THLongStorage_free(dim);
+
+  int oldPath = 0;
+  int omp_flag = omp_in_parallel();
+  if(0 == omp_flag){
+    int r_Contig = THTensor_(isContiguous)(r_)? 1:0;
+    int r_Dim = r_->nDimension;
+    int tDim = t->nDimension;
+    /* size not equal */
+    int tStrideContg = 1;
+    int r_StrideContg = 1;
+    /* all strides below are for advanced searching index*/
+    ptrdiff_t tStride[THTENSOR_MAX_DIM] = {0};
+    ptrdiff_t r_Stride[THTENSOR_MAX_DIM] = {0};
+
+    ptrdiff_t strideSomeDim = 1;
+    int dim;
+    for (dim = tDim; dim > 0; dim--){
+      if(0 == t->stride[dim-1]) {
+        tStrideContg = 0;
+        break;
+      }
+      strideSomeDim *= t->size[dim-1];
+      tStride[dim-1] = strideSomeDim;
+    }
+
+    strideSomeDim = 1;
+    for (dim = r_Dim; dim > 0; dim--){
+      if(0 == r_->stride[dim-1])  {
+        r_StrideContg = 0;
+        break;
+      }
+        strideSomeDim *= r_->size[dim-1];
+        r_Stride[dim-1] = strideSomeDim;
+    }
+
+    real *tp = THTensor_(data)(t);
+    real *rp = THTensor_(data)(r_);
+    if((tStrideContg != 0) && (r_StrideContg != 0) && r_Contig && (tp != rp)){
+      /* for adveanced searching index*/
+
+      ptrdiff_t iter = 0;
+      ptrdiff_t dimSize = t->size[dimension];
+      ptrdiff_t SIZE = THTensor_(nElement)(r_);
+      #pragma omp parallel for if ( SIZE > TH_OMP_OVERHEAD_THRESHOLD)  
+      for (iter = 0; iter < SIZE; iter++) {
+        ptrdiff_t j;
+        ptrdiff_t quot;
+        ptrdiff_t rem = iter;
+        ptrdiff_t tBasicIndex = 0;
+
+
+        for(j = 0; j < r_Dim-1; ++j) {
+          if(j != dimension){
+            quot = rem/r_Stride[j+1];
+            rem = rem%r_Stride[j+1];
+            tBasicIndex += quot*t->stride[j];
+          }
+        }
+        if(j != dimension){
+          tBasicIndex += rem*t->stride[j];
+        }
+        real *t_data = tp+tBasicIndex;
+        real *r__data = rp+iter;
+        *r__data = 0;
+        for(j=0; j < dimSize; ++j) {
+          *r__data += *(t_data + j*t->stride[dimension]);
+        }
+      }
+    } else {
+      oldPath = 1;
+    }
+
+  }
+  if(omp_flag || oldPath) {
+    /* two implementations optimized for data locality*/
+    if (t->stride[dimension] == 1) {
+      TH_TENSOR_DIM_APPLY2(real, t, real, r_, dimension,
+                           accreal sum = 0;
+                           long i;
+                           for(i = 0; i < t_size; i++)
+                             sum += t_data[i*t_stride];
+                           *r__data = (real)sum;);
+    } else {
+      THTensor_(zero)(r_);
+      THTensor *temp_ = THTensor_(newWithTensor)(r_);
+      /* r_.expand_as(t)*/
+      temp_->size[dimension] = t->size[dimension];
+      temp_->stride[dimension] = 0;
+
+      TH_TENSOR_APPLY2(real, temp_, real, t, *temp__data = *temp__data + *t_data;);
+      THTensor_(free)(temp_);
+    }
+  }
+
+  if (!keepdim) {
+    THTensor_(squeeze1d)(r_, r_, dimension);
+  }
+
+}
+
+
+
+void THTensor_(sum2)(THTensor *r_, THTensor *t, int dimension, int keepdim)
 {
   THLongStorage *dim;
 
