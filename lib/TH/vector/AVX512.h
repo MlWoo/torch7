@@ -20,4 +20,6 @@ void THFloatVector_muls_AVX512(float *y, const float *x, const float c, const pt
 void THFloatVector_cadd_AVX512(float *z, const float *x, const float *y, const float c, const ptrdiff_t n);
 void THFloatVector_adds_AVX512(float *y, const float *x, const float c, const ptrdiff_t n);
 
+void THDoubleVector_outerproduct_AVX512(double *z, const double *x, const double *y, const ptrdiff_t m, const ptrdiff_t n);
+void THFloatVector_outerproduct_AVX512(float *z, const double *x, const double *y, const ptrdiff_t m, const ptrdiff_t n);
 #endif
