@@ -1,6 +1,11 @@
+#include <mkl_vsl.h>
+#include <sys/time.h>
+#include "random.h"
+
 #ifndef TH_GENERIC_FILE
 #define TH_GENERIC_FILE "generic/THTensorRandom.c"
 #else
+
 
 void THTensor_(random)(THTensor *self, THGenerator *_generator)
 {
@@ -28,10 +33,55 @@ void THTensor_(geometric)(THTensor *self, THGenerator *_generator, double p)
   TH_TENSOR_APPLY(real, self, *self_data = (real)THRandom_geometric(_generator, p););
 }
 
-void THTensor_(bernoulli)(THTensor *self, THGenerator *_generator, double p)
+void THTensor_(bernoulli2)(THTensor *self, THGenerator *_generator, double p)
 {
   TH_TENSOR_APPLY(real, self, *self_data = (real)THRandom_bernoulli(_generator, p););
 }
+
+void THTensor_(bernoulli)(THTensor *self, THGenerator *_generator, double p)
+{
+  THArgCheck(p >= 0 && p <= 1, 1, "must be >= 0 and <= 1");
+
+  //time as initial seed
+  struct timeval start;
+  gettimeofday(&start,NULL); 
+  long seed = start.tv_sec * 1000 + (double)start.tv_usec/1000;
+
+  RNG  rng = RNGInit(seed);
+  unsigned long seedNew = RandInt(&rng);
+  
+  int n = THTensor_(nElement)(self);
+  real *r = THTensor_(data)(self);
+  int nthr = omp_get_max_threads();
+
+  int *tmp = (int*)malloc(n*sizeof(int));
+
+  # pragma omp parallel num_threads(nthr)
+  { 
+    const int ithr = omp_get_thread_num();
+    const int avg_amount = (n + nthr - 1) / nthr;
+    const int my_offset = ithr * avg_amount;
+    const int my_index = my_offset + avg_amount;
+    const int my_index_min = my_index <= n ? my_index:n;
+    const int my_amount = my_index_min - my_offset;
+         
+    if (my_amount > 0) {
+      VSLStreamStatePtr stream;
+      vslNewStream(&stream, VSL_BRNG_MCG31, seedNew);
+      vslSkipAheadStream(stream, my_offset);
+      viRngBernoulli(VSL_RNG_METHOD_BERNOULLI_ICDF, stream, my_amount, tmp + my_offset, p);
+      vslDeleteStream(&stream);
+    }
+  }
+  int k;
+  for(k=0;k<n;k++)
+  {
+    r[k]=tmp[k];
+  }
+  free(tmp);
+
+}
+
 
 void THTensor_(bernoulli_FloatTensor)(THTensor *self, THGenerator *_generator, THFloatTensor *p)
 {
