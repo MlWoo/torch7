@@ -581,7 +581,7 @@
             CODE                                \
           }\
         }\
-      } else if((TENSOR2##Dim == TENSOR1##Dim) && (TENSOR2##Dim > 2) && CONTIG1){              \
+      } else if(CONTIG1){              \
         ptrdiff_t iter = 0;\
                           \
         PRAGMA2( omp parallel for if (SIZE > TH_OMP_OVERHEAD_THRESHOLD_COPY) )  \
@@ -601,7 +601,7 @@
           TYPE1 *TENSOR1##_data = rp+iter;\
           CODE                                \
         }\
-      } else if((TENSOR2##Dim == TENSOR1##Dim) && (TENSOR2##Dim > 2) && CONTIG2){\
+      } else if(CONTIG2){\
         ptrdiff_t iter = 0;\
                           \
         PRAGMA2( omp parallel for if (SIZE > TH_OMP_OVERHEAD_THRESHOLD_COPY)  )  \
@@ -1029,6 +1029,7 @@
           } \
         } else {\
           PRAGMA2( omp parallel for if (SIZE > TH_OMP_OVERHEAD_THRESHOLD_COPY) )  \
+          PRAGMA2(simd) \
           for (iter = 0; iter < SIZE; iter++) {\
             TYPE1 *TENSOR1##_data = rp+iter;\
             TYPE2 *TENSOR2##_data = tp+iter; \
@@ -1036,7 +1037,7 @@
             CODE                                \
           } \
         }\
-      } else if((TENSOR2##Dim == TENSOR1##Dim) && (TENSOR3##Dim == TENSOR1##Dim) && (TENSOR1##Dim > 2) && CONTIG1 && CONTIG2){              \
+      } else if(CONTIG1 && CONTIG2){              \
         /*TENSOR3 is not contig*/ \
         ptrdiff_t iter = 0;\
                           \
@@ -1058,7 +1059,7 @@
           TYPE1 *TENSOR1##_data = rp+iter;\
           CODE                                \
         }\
-      } else if((TENSOR2##Dim == TENSOR1##Dim) && (TENSOR3##Dim == TENSOR1##Dim) && (TENSOR1##Dim > 2) && CONTIG1 && CONTIG3){              \
+      } else if(CONTIG1 && CONTIG3){              \
         /*TENSOR2 is not contig*/ \
         ptrdiff_t iter = 0;\
                           \
@@ -1080,7 +1081,7 @@
           TYPE1 *TENSOR1##_data = rp+iter;\
           CODE                                \
         }\
-      } else if((TENSOR2##Dim == TENSOR1##Dim) && (TENSOR3##Dim == TENSOR1##Dim) && (TENSOR2##Dim > 2) && CONTIG2 && CONTIG3){              \
+      } else if(CONTIG2 && CONTIG3){              \
         /*TENSOR1 is not contig*/ \
         ptrdiff_t iter = 0;\
                           \
@@ -1102,7 +1103,7 @@
           TYPE1 *TENSOR1##_data = rp+TENSOR1##BasicIndex;\
           CODE                                \
         }\
-      } else if((TENSOR2##Dim == TENSOR1##Dim) && (TENSOR3##Dim == TENSOR1##Dim) && (TENSOR2##Dim > 2) && CONTIG3){\
+      } else if(CONTIG3){\
         /* only tensor3 is contig*/ \
         ptrdiff_t iter = 0;\
                           \
@@ -1132,7 +1133,7 @@
           TYPE1 *TENSOR1##_data = rp+TENSOR1##BasicIndex;\
           CODE                                \
         }\
-      } else if((TENSOR2##Dim == TENSOR1##Dim) && (TENSOR3##Dim == TENSOR1##Dim) && (TENSOR2##Dim > 2) && CONTIG2){\
+      } else if(CONTIG2){\
         /* only tensor2 is contig*/ \
         ptrdiff_t iter = 0;\
                           \
@@ -1162,7 +1163,7 @@
           TYPE1 *TENSOR1##_data = rp+TENSOR1##BasicIndex;\
           CODE                                \
         }\
-      } else if((TENSOR2##Dim == TENSOR1##Dim) && (TENSOR3##Dim == TENSOR1##Dim) && (TENSOR2##Dim > 2) && CONTIG1){\
+      } else if(CONTIG1){\
         /* only tensor1 is contig*/ \
         ptrdiff_t iter = 0;\
                           \
