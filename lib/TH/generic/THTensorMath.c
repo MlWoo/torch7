@@ -1858,35 +1858,10 @@ void THTensor_(addr)(THTensor *r_, real beta, THTensor *t, real alpha, THTensor 
   }
   else if(r_->stride[1] == 1)
   {
-    /*THBlas_(ger)(vec2->size[0], vec1->size[0],
+    THBlas_(ger)(vec2->size[0], vec1->size[0],
                  alpha, THTensor_(data)(vec2), vec2->stride[0],
                  THTensor_(data)(vec1), vec1->stride[0],
                  THTensor_(data)(r_), r_->stride[0]);
-   
-*/
-    ptrdiff_t i; 
-    const ptrdiff_t m = vec2->size[0];
-    const ptrdiff_t n = vec1->size[0];
-    const float* x = (float*)THTensor_(data)(vec2);
-    const float* y = (float*)THTensor_(data)(vec1);
-    const ptrdiff_t off = (n) - ((n)%16);
-    #pragma omp parallel for if (m>TH_OMP_OVERHEAD_THRESHOLD)
-    for (i=0; i<m; ++i){ 
-      float* temp_z = (float*)THTensor_(data)(r_) + i * n;
-      const float c = x[i];  
-       __m512 YMM15 = _mm512_set_ps(c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c); 
-      ptrdiff_t j; 
-      for (j=0; j<=((n)-16); j+=16) {
-         __m512 YMM0, YMM1;
-         YMM0 = _mm512_loadu_ps(y+j);
-         YMM1 = _mm512_loadu_ps(temp_z+j);
-         YMM1 = _mm512_fmadd_ps(YMM0, YMM15, YMM1);       
-         _mm512_storeu_ps(temp_z+j, YMM1);
-      }
-      for (j=off; j<(n); ++j) { 
-        temp_z[j] = temp_z[j] + y[j] * c;  
-      }
-    }    
   }
   else
   {
@@ -1896,6 +1871,7 @@ void THTensor_(addr)(THTensor *r_, real beta, THTensor *t, real alpha, THTensor 
                  alpha, THTensor_(data)(vec2), vec2->stride[0],
                  THTensor_(data)(vec1), vec1->stride[0],
                  THTensor_(data)(cr), cr->stride[0]);
+
     THTensor_(freeCopyTo)(cr, r_);
   }
 }
