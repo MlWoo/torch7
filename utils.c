@@ -222,6 +222,77 @@ static int torch_updateerrorhandlers(lua_State *L)
   return 0;
 }
 
+int GLB_LOG_ENABLE = 0;
+FILE * fp;
+
+static int torch_elementwiseLog(lua_State *L)
+{
+  GLB_LOG_ENABLE = luaL_checkint(L, 1);
+  return 0;
+}
+
+static int torch_startLogFile(lua_State *L)
+{
+  const char * fileName;
+  if (lua_isstring(L,1) ) {
+    fileName = lua_tostring(L,1);
+  } else {
+    printf("the input is not a string\n");
+    getchar();
+    exit(1);
+  }
+  fp = fopen(fileName, "wt+");
+  if(fp == NULL) {
+    printf("error to open the file %s\n", fileName);
+    getchar();
+    exit(1);
+  }
+  return 0;
+}
+static int torch_stopLogFile(lua_State *L)
+{
+  if(fp == NULL) {
+    printf("error to find the file handle \n");
+    getchar();
+    exit(1);
+  } else {
+	fclose(fp);
+  }
+  return 0;
+}
+
+float start_log()
+{
+  if (GLB_LOG_ENABLE) {
+    struct timeval clock_v;
+    gettimeofday(&clock_v, NULL);
+    return (clock_v.tv_sec*1000 + (float)clock_v.tv_sec/1000);
+  }
+  return 0;
+}
+
+void end_log2(float start_time, long size1, long size2, int contig1, int contig2,  const char* func_name, char* source_file_name)
+{
+  if (GLB_LOG_ENABLE) {
+    struct timeval clock_v;
+    gettimeofday(&clock_v, NULL);
+    float interval = (clock_v.tv_sec*1000 + (float)clock_v.tv_sec/1000) - start_time;
+    fprintf(fp, "time: %10f\tsize1:%10ld\tsize2:%10ld\tcontig1:%2d\tcontig2:%2d\tfunc:%s\tfile:%s\n", interval, size1, size2, contig1, contig2, func_name, source_file_name);   
+  }
+}
+
+void end_log3(float start_time, long size1, long size2, long size3, int contig1, int contig2, int contig3, const char* func_name, char* source_file_name)
+{
+  if (GLB_LOG_ENABLE) {
+    struct timeval clock_v;
+    gettimeofday(&clock_v, NULL);
+    float interval = (clock_v.tv_sec*1000 + (float)clock_v.tv_sec/1000) - start_time;
+    fprintf(fp, "time: %10f\tsize1:%10ld\tsize2:%10ld\tsize3:%10ld\tcontig1:%2d\tcontig2:%2d\tcontig3:%2d\tfunc:%s\tfile:%s\n", interval, size1, size2, size3, contig1, contig2, contig3, func_name, source_file_name);    
+  }
+}
+
+
+
 static const struct luaL_Reg torch_utils__ [] = {
   {"getdefaulttensortype", torch_lua_getdefaulttensortype},
   {"isatty", torch_isatty},
@@ -245,8 +316,12 @@ static const struct luaL_Reg torch_utils__ [] = {
   {"pointer", luaT_lua_pointer},
   {"setheaptracking", torch_setheaptracking},
   {"updateerrorhandlers", torch_updateerrorhandlers},
+  {"elementwiseLog",  torch_elementwiseLog},
+  {"startLogFile",  torch_startLogFile},
+  {"stopLogFile",  torch_stopLogFile},
   {NULL, NULL}
 };
+
 
 void torch_utils_init(lua_State *L)
 {
