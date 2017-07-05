@@ -104,9 +104,9 @@ void THTensor_(fill)(THTensor *r_, real value)
     TH_TENSOR_APPLY(real, r_,
       if (r__stride == 1) {
         THVector_(fill)(r__data, value, r__size);
-	r__i = r__size;
-	r__data += r__stride * r__size;
-	break;
+    r__i = r__size;
+    r__data += r__stride * r__size;
+    break;
       } else {
         *r__data = value;
       }
@@ -686,7 +686,7 @@ void THTensor_(add)(THTensor *r_, THTensor *t, real value)
 #endif
    }
   } else {
-	TH_TENSOR_APPLY2(real, r_, real, t, *r__data = *t_data + value;);
+    TH_TENSOR_APPLY2(real, r_, real, t, *r__data = *t_data + value;);
   }
 }
 
@@ -713,7 +713,7 @@ void THTensor_(mul)(THTensor *r_, THTensor *t, real value)
 #endif
     }
   } else {
-	TH_TENSOR_APPLY2(real, r_, real, t, *r__data = *t_data * value;);
+    TH_TENSOR_APPLY2(real, r_, real, t, *r__data = *t_data * value;);
   }
 }
 
@@ -735,7 +735,7 @@ void THTensor_(div)(THTensor *r_, THTensor *t, real value)
 #endif
     }
   } else {
-	TH_TENSOR_APPLY2(real, r_, real, t, *r__data = *t_data / value;);
+    TH_TENSOR_APPLY2(real, r_, real, t, *r__data = *t_data / value;);
   }
 }
 
@@ -968,7 +968,7 @@ void THTensor_(bitand)(THTensor *r_, THTensor *t, real value)
 #endif 
     }
   } else {
-	TH_TENSOR_APPLY2(real, r_, real, t, *r__data = *t_data & value;);
+    TH_TENSOR_APPLY2(real, r_, real, t, *r__data = *t_data & value;);
   }
 #endif
 }
@@ -1001,7 +1001,7 @@ void THTensor_(bitor)(THTensor *r_, THTensor *t, real value)
 #endif
     }
   } else {
-	TH_TENSOR_APPLY2(real, r_, real, t, *r__data = *t_data | value;);
+    TH_TENSOR_APPLY2(real, r_, real, t, *r__data = *t_data | value;);
   }
 #endif
 }
@@ -1034,7 +1034,7 @@ void THTensor_(bitxor)(THTensor *r_, THTensor *t, real value)
 #endif
     }
   } else {
-	TH_TENSOR_APPLY2(real, r_, real, t, *r__data = *t_data ^ value;); 
+    TH_TENSOR_APPLY2(real, r_, real, t, *r__data = *t_data ^ value;); 
   }
 #endif
 }
@@ -1064,7 +1064,7 @@ void THTensor_(clamp)(THTensor *r_, THTensor *t, real min_value, real max_value)
 #endif
     }
   } else {
-	  TH_TENSOR_APPLY2(real, r_, real, t, *r__data = (*t_data < min_value) ? min_value : (*t_data > max_value ? max_value : *t_data););
+      TH_TENSOR_APPLY2(real, r_, real, t, *r__data = (*t_data < min_value) ? min_value : (*t_data > max_value ? max_value : *t_data););
   }
 }
 //hallo3
@@ -1091,7 +1091,7 @@ void THTensor_(cadd)(THTensor *r_, THTensor *t, real value, THTensor *src)
 #endif
     }
   } else {
-	TH_TENSOR_APPLY3(real, r_, real, t, real, src, *r__data = *t_data + value * *src_data;);  
+    TH_TENSOR_APPLY3(real, r_, real, t, real, src, *r__data = *t_data + value * *src_data;);  
   }
 }
 
@@ -1119,7 +1119,7 @@ void THTensor_(cmul)(THTensor *r_, THTensor *t, THTensor *src)
 #endif
     }
   } else {
-	  TH_TENSOR_APPLY3(real, r_, real, t, real, src, *r__data = *t_data * *src_data;);
+      TH_TENSOR_APPLY3(real, r_, real, t, real, src, *r__data = *t_data * *src_data;);
   }
 }
 
@@ -1149,7 +1149,7 @@ void THTensor_(cpow)(THTensor *r_, THTensor *t, THTensor *src)
 #endif
     }
   } else {
-	TH_TENSOR_APPLY3(real, r_, real, t, real, src, *r__data = pow(*t_data, *src_data);); 
+    TH_TENSOR_APPLY3(real, r_, real, t, real, src, *r__data = pow(*t_data, *src_data);); 
   }
 }
 
@@ -1172,7 +1172,7 @@ void THTensor_(cdiv)(THTensor *r_, THTensor *t, THTensor *src)
 #endif
     }
   } else {
-	  TH_TENSOR_APPLY3(real, r_, real, t, real, src, *r__data = *t_data / *src_data;);
+      TH_TENSOR_APPLY3(real, r_, real, t, real, src, *r__data = *t_data / *src_data;);
   }
 }
 
@@ -1189,7 +1189,7 @@ void THTensor_(clshift)(THTensor *r_, THTensor *t, THTensor *src)
   int srcContig = THTensor_(isContiguous)(src)? 1:0;  
   if (srcSize == r_Size){
     if (r_Contig && tContig && srcContig) {
-	  real *tp = THTensor_(data)(t);
+      real *tp = THTensor_(data)(t);
       real *sp = THTensor_(data)(src);
       real *rp = THTensor_(data)(r_);
       ptrdiff_t i;
@@ -1258,7 +1258,7 @@ void THTensor_(crshift)(THTensor *r_, THTensor *t, THTensor *src)
   int srcContig = THTensor_(isContiguous)(src)? 1:0;  
   if (srcSize == r_Size){
     if (r_Contig && tContig && srcContig) {
-	  real *tp = THTensor_(data)(t);
+      real *tp = THTensor_(data)(t);
       real *sp = THTensor_(data)(src);
       real *rp = THTensor_(data)(r_);
       ptrdiff_t i;
@@ -1324,7 +1324,7 @@ void THTensor_(cfmod)(THTensor *r_, THTensor *t, THTensor *src)
   int srcContig = THTensor_(isContiguous)(src)? 1:0;  
   if (srcSize == r_Size){
     if (r_Contig && tContig && srcContig) {
-	  real *tp = THTensor_(data)(t);
+      real *tp = THTensor_(data)(t);
       real *sp = THTensor_(data)(src);
       real *rp = THTensor_(data)(r_);
       ptrdiff_t i;
@@ -1374,7 +1374,7 @@ void THTensor_(cremainder)(THTensor *r_, THTensor *t, THTensor *src)
   int srcContig = THTensor_(isContiguous)(src)? 1:0;  
   if (srcSize == r_Size){
     if (r_Contig && tContig && srcContig) {
-	  real *tp = THTensor_(data)(t);
+      real *tp = THTensor_(data)(t);
       real *sp = THTensor_(data)(src);
       real *rp = THTensor_(data)(r_);
       ptrdiff_t i;
@@ -1452,7 +1452,7 @@ void THTensor_(cbitand)(THTensor *r_, THTensor *t, THTensor *src)
 #endif
     }
   } else {
-	  TH_TENSOR_APPLY3(real, r_, real, t, real, src, *r__data = *t_data & *src_data;);
+      TH_TENSOR_APPLY3(real, r_, real, t, real, src, *r__data = *t_data & *src_data;);
   }
 
 #endif
@@ -1487,7 +1487,7 @@ void THTensor_(cbitor)(THTensor *r_, THTensor *t, THTensor *src)
 #endif
     }
   } else {
-	  TH_TENSOR_APPLY3(real, r_, real, t, real, src, *r__data = *t_data | *src_data;);
+      TH_TENSOR_APPLY3(real, r_, real, t, real, src, *r__data = *t_data | *src_data;);
   }
 #endif
 }
@@ -1549,7 +1549,7 @@ void THTensor_(tpow)(THTensor *r_, real value, THTensor *t)
 #endif
    }
   } else {
-	TH_TENSOR_APPLY2(real, r_, real, t, *r__data = pow(value, *t_data););
+    TH_TENSOR_APPLY2(real, r_, real, t, *r__data = pow(value, *t_data););
   }
 }
 
@@ -1567,14 +1567,14 @@ void THTensor_(addcmul)(THTensor *r_, THTensor *t, real value, THTensor *src1, T
   int r_Contig = THTensor_(isContiguous)(r_)? 1:0;                 
   int src1Contig = THTensor_(isContiguous)(src1)? 1:0;   
   int src2Contig = THTensor_(isContiguous)(src2)? 1:0;  
-  if((src1Size = src2Size) && (src1Size == r_Size) ){	  
+  if((src1Size = src2Size) && (src1Size == r_Size) ){      
 #ifdef _OPENMP
     TH_TENSOR_APPLY3_ADVANCED_INDEX2(r_Size, r_Contig, src1Contig, src2Contig, real, r_, real, src1, real, src2, *r__data += value * *src1_data * *src2_data;);
 #else
     TH_TENSOR_APPLY3(real, r_, real, src1, real, src2, *r__data += value * *src1_data * *src2_data;);
 #endif
   } else {
-	TH_TENSOR_APPLY3(real, r_, real, src1, real, src2, *r__data += value * *src1_data * *src2_data;);  
+    TH_TENSOR_APPLY3(real, r_, real, src1, real, src2, *r__data += value * *src1_data * *src2_data;);  
   }
 }
 
@@ -1592,14 +1592,14 @@ void THTensor_(addcdiv)(THTensor *r_, THTensor *t, real value, THTensor *src1, T
   int r_Contig = THTensor_(isContiguous)(r_)? 1:0;                 
   int src1Contig = THTensor_(isContiguous)(src1)? 1:0;   
   int src2Contig = THTensor_(isContiguous)(src2)? 1:0;  
-  if((src1Size = src2Size) && (src1Size == r_Size) ){	  
+  if((src1Size = src2Size) && (src1Size == r_Size) ){      
 #ifdef _OPENMP
     TH_TENSOR_APPLY3_ADVANCED_INDEX2(r_Size, r_Contig, src1Contig, src2Contig, real, r_, real, src1, real, src2, *r__data += value * *src1_data / *src2_data;);
 #else
     TH_TENSOR_APPLY3(real, r_, real, src1, real, src2, *r__data += value * *src1_data / *src2_data;);
 #endif
   } else {
-	TH_TENSOR_APPLY3(real, r_, real, src1, real, src2, *r__data += value * *src1_data / *src2_data;);
+    TH_TENSOR_APPLY3(real, r_, real, src1, real, src2, *r__data += value * *src1_data / *src2_data;);
   }
 
   
@@ -2114,6 +2114,117 @@ void THTensor_(min)(THTensor *values_, THLongTensor *indices_, THTensor *t, int 
 
 
 void THTensor_(sum)(THTensor *r_, THTensor *t, int dimension, int keepdim)
+{
+  THLongStorage *dim;
+
+  THArgCheck(dimension >= 0 && dimension < THTensor_(nDimension)(t), 2, "dimension %d out of range",
+      dimension + TH_INDEX_BASE);
+
+  dim = THTensor_(newSizeOf)(t);
+  THLongStorage_set(dim, dimension, 1);
+  THTensor_(resize)(r_, dim, NULL);
+  THLongStorage_free(dim);
+
+  int oldPath = 0;
+  int omp_flag = omp_in_parallel();
+  if(0 == omp_flag){
+    int r_Contig = THTensor_(isContiguous)(r_)? 1:0;
+    int r_Dim = r_->nDimension;
+    int tDim = t->nDimension;
+    /* size not equal */
+    int tStrideContg = 1;
+    int r_StrideContg = 1;
+    /* all strides below are for advanced searching index*/
+    ptrdiff_t tStride[THTENSOR_MAX_DIM] = {0};
+    ptrdiff_t r_Stride[THTENSOR_MAX_DIM] = {0};
+
+    ptrdiff_t strideSomeDim = 1;
+    int dim;
+    for (dim = tDim; dim > 0; dim--){
+      if(0 == t->stride[dim-1]) {
+        tStrideContg = 0;
+        break;
+      }
+      strideSomeDim *= t->size[dim-1];
+      tStride[dim-1] = strideSomeDim;
+    }
+
+    strideSomeDim = 1;
+    for (dim = r_Dim; dim > 0; dim--){
+      if(0 == r_->stride[dim-1])  {
+        r_StrideContg = 0;
+        break;
+      }
+        strideSomeDim *= r_->size[dim-1];
+        r_Stride[dim-1] = strideSomeDim;
+    }
+
+    real *tp = THTensor_(data)(t);
+    real *rp = THTensor_(data)(r_);
+    if((tStrideContg != 0) && (r_StrideContg != 0) && r_Contig && (tp != rp)){
+      /* for adveanced searching index*/
+
+      ptrdiff_t iter = 0;
+      ptrdiff_t dimSize = t->size[dimension];
+      ptrdiff_t SIZE = THTensor_(nElement)(r_);
+      #pragma omp parallel for if ( SIZE > TH_OMP_OVERHEAD_THRESHOLD)  
+      for (iter = 0; iter < SIZE; iter++) {
+        ptrdiff_t j;
+        ptrdiff_t quot;
+        ptrdiff_t rem = iter;
+        ptrdiff_t tBasicIndex = 0;
+
+
+        for(j = 0; j < r_Dim-1; ++j) {
+          if(j != dimension){
+            quot = rem/r_Stride[j+1];
+            rem = rem%r_Stride[j+1];
+            tBasicIndex += quot*t->stride[j];
+          }
+        }
+        if(j != dimension){
+          tBasicIndex += rem*t->stride[j];
+        }
+        real *t_data = tp+tBasicIndex;
+        real *r__data = rp+iter;
+        *r__data = 0;
+        for(j=0; j < dimSize; ++j) {
+          *r__data += *(t_data + j*t->stride[dimension]);
+        }
+      }
+    } else {
+      oldPath = 1;
+    }
+
+  }
+  if(omp_flag || oldPath) {
+    /* two implementations optimized for data locality*/
+    if (t->stride[dimension] == 1) {
+      TH_TENSOR_DIM_APPLY2(real, t, real, r_, dimension,
+                           accreal sum = 0;
+                           long i;
+                           for(i = 0; i < t_size; i++)
+                             sum += t_data[i*t_stride];
+                           *r__data = (real)sum;);
+    } else {
+      THTensor_(zero)(r_);
+      THTensor *temp_ = THTensor_(newWithTensor)(r_);
+      /* r_.expand_as(t)*/
+      temp_->size[dimension] = t->size[dimension];
+      temp_->stride[dimension] = 0;
+
+      TH_TENSOR_APPLY2(real, temp_, real, t, *temp__data = *temp__data + *t_data;);
+      THTensor_(free)(temp_);
+    }
+  }
+
+  if (!keepdim) {
+    THTensor_(squeeze1d)(r_, r_, dimension);
+  }
+
+}
+
+void THTensor_(sum2)(THTensor *r_, THTensor *t, int dimension, int keepdim)
 {
   THLongStorage *dim;
 
@@ -3156,31 +3267,31 @@ int THTensor_(equal)(THTensor *ta, THTensor* tb)
   return equal;
 }
 
-#define TENSOR_IMPLEMENT_LOGICAL(NAME,OP)				\
-  void THTensor_(NAME##Value)(THByteTensor *r_, THTensor* t, real value)	\
-  {									\
-    THByteTensor_resizeNd(r_, t->nDimension, t->size, NULL);		\
-    TH_TENSOR_APPLY2(unsigned char, r_, real, t,			\
-		     *r__data = (*t_data OP value) ? 1 : 0;); \
-  }									\
-  void THTensor_(NAME##ValueT)(THTensor* r_, THTensor* t, real value)	\
-  {									\
-    THTensor_(resizeNd)(r_, t->nDimension, t->size, NULL);		\
-    TH_TENSOR_APPLY2(real, r_, real, t,					\
-		     *r__data = (*t_data OP value) ? 1 : 0;); \
-  }									\
+#define TENSOR_IMPLEMENT_LOGICAL(NAME,OP)                \
+  void THTensor_(NAME##Value)(THByteTensor *r_, THTensor* t, real value)    \
+  {                                    \
+    THByteTensor_resizeNd(r_, t->nDimension, t->size, NULL);        \
+    TH_TENSOR_APPLY2(unsigned char, r_, real, t,            \
+             *r__data = (*t_data OP value) ? 1 : 0;); \
+  }                                    \
+  void THTensor_(NAME##ValueT)(THTensor* r_, THTensor* t, real value)    \
+  {                                    \
+    THTensor_(resizeNd)(r_, t->nDimension, t->size, NULL);        \
+    TH_TENSOR_APPLY2(real, r_, real, t,                    \
+             *r__data = (*t_data OP value) ? 1 : 0;); \
+  }                                    \
   void THTensor_(NAME##Tensor)(THByteTensor *r_, THTensor *ta, THTensor *tb) \
-  {									\
-    THByteTensor_resizeNd(r_, ta->nDimension, ta->size, NULL);		\
-    TH_TENSOR_APPLY3(unsigned char, r_, real, ta, real, tb,		\
-		     *r__data = (*ta_data OP *tb_data) ? 1 : 0;); \
-  }									\
+  {                                    \
+    THByteTensor_resizeNd(r_, ta->nDimension, ta->size, NULL);        \
+    TH_TENSOR_APPLY3(unsigned char, r_, real, ta, real, tb,        \
+             *r__data = (*ta_data OP *tb_data) ? 1 : 0;); \
+  }                                    \
   void THTensor_(NAME##TensorT)(THTensor *r_, THTensor *ta, THTensor *tb) \
-  {									\
-    THTensor_(resizeNd)(r_, ta->nDimension, ta->size, NULL);		\
-    TH_TENSOR_APPLY3(real, r_, real, ta, real, tb,			\
-		     *r__data = (*ta_data OP *tb_data) ? 1 : 0;); \
-  }									\
+  {                                    \
+    THTensor_(resizeNd)(r_, ta->nDimension, ta->size, NULL);        \
+    TH_TENSOR_APPLY3(real, r_, real, ta, real, tb,            \
+             *r__data = (*ta_data OP *tb_data) ? 1 : 0;); \
+  }                                    \
 
 
 TENSOR_IMPLEMENT_LOGICAL(lt,<)
@@ -3196,48 +3307,48 @@ TENSOR_IMPLEMENT_LOGICAL(ne,!=)
   void THTensor_(NAME)(THTensor *r_, THTensor *t)             \
   {                                                           \
     THTensor_(resizeAs)(r_, t);                               \
-    ptrdiff_t r_Size = THTensor_(nElement)(r_);                 \
-    ptrdiff_t tSize = THTensor_(nElement)(t);                   \
+    ptrdiff_t r_Size = THTensor_(nElement)(r_);               \
+    ptrdiff_t tSize = THTensor_(nElement)(t);                 \
     int r_Contig = THTensor_(isContiguous)(r_)? 1:0;          \
     int tContig = THTensor_(isContiguous)(t)? 1:0;            \
-    if( (tSize == r_Size) && (r_Size > TH_OMP_OVERHEAD_THRESHOLD) ){                                 \
-	  TH_TENSOR_APPLY2_ADVANCED_INDEX2(r_Size, r_Contig, tContig, real, t, real, r_, *r__data = CFUNC(*t_data);); 			    \
-	}         																						\
-    else {    																						\
-      TH_TENSOR_APPLY2(real, t, real, r_, *r__data = CFUNC(*t_data);); 								\
-    }																								\
-  }                                                             									\
+    if( (tSize == r_Size) && (r_Size > TH_OMP_OVERHEAD_THRESHOLD) ){                                              \
+      TH_TENSOR_APPLY2_ADVANCED_INDEX2(r_Size, r_Contig, tContig, real, r_, real, t, *r__data = CFUNC(*t_data);); \
+    }                                                                                                             \
+    else {                                                                                                        \
+      TH_TENSOR_APPLY2(real, r_, real, t, *r__data = CFUNC(*t_data););                                             \
+    }                                                                                                             \
+  }                                                                                                               \ 
   
-#define LAB_IMPLEMENT_BASIC_CODE(NAME, CODE)             \
+#define LAB_IMPLEMENT_BASIC_CODE(NAME, CODE)                  \
   void THTensor_(NAME)(THTensor *r_, THTensor *t)             \
   {                                                           \
     THTensor_(resizeAs)(r_, t);                               \
-    ptrdiff_t r_Size = THTensor_(nElement)(r_);                 \
-    ptrdiff_t tSize = THTensor_(nElement)(t);                   \
+    ptrdiff_t r_Size = THTensor_(nElement)(r_);               \
+    ptrdiff_t tSize = THTensor_(nElement)(t);                 \
     int r_Contig = THTensor_(isContiguous)(r_)? 1:0;          \
     int tContig = THTensor_(isContiguous)(t)? 1:0;            \
-    if( (tSize == r_Size) && (r_Size > TH_OMP_OVERHEAD_THRESHOLD) ){                                 \
-	  TH_TENSOR_APPLY2_ADVANCED_INDEX2(r_Size, r_Contig, tContig, real, t, real, r_, CODE); 			    \
-	}         																						\
-    else {    																						\
-      TH_TENSOR_APPLY2(real, t, real, r_, CODE); 								\
-    }																								\
+    if( (tSize == r_Size) && (r_Size > TH_OMP_OVERHEAD_THRESHOLD) ){                                  \
+      TH_TENSOR_APPLY2_ADVANCED_INDEX2(r_Size, r_Contig, tContig, real, r_, real, t, CODE);           \
+    }                                                                                                 \
+    else {                                                                                            \
+      TH_TENSOR_APPLY2(real, r_, real, t, CODE);                                                      \
+    }                                                                                                 \
   }    
   
 #else
-#define LAB_IMPLEMENT_BASIC_FUNCTION(NAME, CFUNC)             										\
-  void THTensor_(NAME)(THTensor *r_, THTensor *t)                									\
-  {                                                           										\
-    THTensor_(resizeAs)(r_, t);                               										\
-    TH_TENSOR_APPLY2(real, t, real, r_, *r__data = CFUNC(*t_data);); 								\
-  }  																								\
+#define LAB_IMPLEMENT_BASIC_FUNCTION(NAME, CFUNC)                                                     \
+  void THTensor_(NAME)(THTensor *r_, THTensor *t)                                                     \
+  {                                                                                                   \
+    THTensor_(resizeAs)(r_, t);                                                                       \
+    TH_TENSOR_APPLY2(real, r_, real, t, *r__data = CFUNC(*t_data););                                  \
+  }                                                                                                   \
   
-  #define LAB_IMPLEMENT_BASIC_CODE(NAME, CODE)             										\
-  void THTensor_(NAME)(THTensor *r_, THTensor *t)                									\
-  {                                                           										\
-    THTensor_(resizeAs)(r_, t);                               										\
-    TH_TENSOR_APPLY2(real, t, real, r_, CODE); 								\
-  }  																								\
+  #define LAB_IMPLEMENT_BASIC_CODE(NAME, CODE)                                                        \
+  void THTensor_(NAME)(THTensor *r_, THTensor *t)                                                     \
+  {                                                                                                   \
+    THTensor_(resizeAs)(r_, t);                                                                       \
+    TH_TENSOR_APPLY2(real, r_, real, t, CODE);                                                        \
+  }                                                                                                   \
   
 
 #endif
@@ -3246,29 +3357,29 @@ TENSOR_IMPLEMENT_LOGICAL(ne,!=)
 
 #ifdef _OPENMP
 #define LAB_IMPLEMENT_BASIC_FUNCTION_VALUE(NAME, CFUNC)                 \
-  void THTensor_(NAME)(THTensor *r_, THTensor *t, real value)              \
+  void THTensor_(NAME)(THTensor *r_, THTensor *t, real value)           \
   {                                                                     \
-    THTensor_(resizeAs)(r_, t);                               \
-    ptrdiff_t r_Size = THTensor_(nElement)(r_);                 \
-    ptrdiff_t tSize = THTensor_(nElement)(t);                   \
-    int r_Contig = THTensor_(isContiguous)(r_)? 1:0;          \
-    int tContig = THTensor_(isContiguous)(t)? 1:0;            \
-    if( (tSize == r_Size) && (r_Size > TH_OMP_OVERHEAD_THRESHOLD) ){                                 \
-	  TH_TENSOR_APPLY2_ADVANCED_INDEX2(r_Size, r_Contig, tContig, real, t, real, r_, *r__data = CFUNC(*t_data, value);); 			    \
-	}         																						\
-    else {    																						\
-      TH_TENSOR_APPLY2(real, t, real, r_, *r__data = CFUNC(*t_data, value);); 								\
-    }																							\
-  }                                                                      \
+    THTensor_(resizeAs)(r_, t);                                         \
+    ptrdiff_t r_Size = THTensor_(nElement)(r_);                         \
+    ptrdiff_t tSize = THTensor_(nElement)(t);                           \
+    int r_Contig = THTensor_(isContiguous)(r_)? 1:0;                    \
+    int tContig = THTensor_(isContiguous)(t)? 1:0;                      \
+    if( (tSize == r_Size) && (r_Size > TH_OMP_OVERHEAD_THRESHOLD) ){                                                     \
+      TH_TENSOR_APPLY2_ADVANCED_INDEX2(r_Size, r_Contig, tContig, real, r_, real, t, *r__data = CFUNC(*t_data, value);); \
+    }                                                                                                                    \
+    else {                                                                                                               \
+      TH_TENSOR_APPLY2(real, r_, real, t, *r__data = CFUNC(*t_data, value););                                            \
+    }                                                                                                                    \
+  }                                                                                                                      \
   
 #else
 
-#define LAB_IMPLEMENT_BASIC_FUNCTION_VALUE(NAME, CFUNC)                 \
-  void THTensor_(NAME)(THTensor *r_, THTensor *t, real value)              \
-  {                                                                     \
-    THTensor_(resizeAs)(r_, t);                                         \
-    TH_TENSOR_APPLY2(real, t, real, r_, *r__data = CFUNC(*t_data, value);); \
-  }                                                                     \
+#define LAB_IMPLEMENT_BASIC_FUNCTION_VALUE(NAME, CFUNC)                     \
+  void THTensor_(NAME)(THTensor *r_, THTensor *t, real value)               \
+  {                                                                         \
+    THTensor_(resizeAs)(r_, t);                                             \
+    TH_TENSOR_APPLY2(real, r_, real, t, *r__data = CFUNC(*t_data, value);); \
+  }                                                                         \
 
 #endif
 
