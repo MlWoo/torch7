@@ -178,7 +178,7 @@
 #define PRAGMA(P) __pragma(P)
 #endif
 
-#define THTENSOR_MAX_DIM 10
+#define THTENSOR_MAX_DIM 64
 #define TH_OMP_OVERHEAD_THRESHOLD_COPY 1000 
 #include <x86intrin.h>
 
@@ -197,7 +197,7 @@ extern ptrdiff_t SearchingIndex(ptrdiff_t index, long *stride, long dim, long* s
         int dim;                                                                  \
         strideSomeDim = 1;                                                        \
         for (dim = TENSOR1##Dim; dim > 0; dim--){                                 \
-          if(0 == TENSOR1->stride[dim])  {                                         \
+          if(0 == TENSOR1->stride[dim-1])  {                                         \
               TENSOR1##StrideContg = 0;                                              \
               break;                                                                \
           }                                                                       \
@@ -206,32 +206,19 @@ extern ptrdiff_t SearchingIndex(ptrdiff_t index, long *stride, long dim, long* s
         }                                                                         \
         if(TENSOR1##StrideContg != 0) {                                          \
           TYPE1 *rp = THTensor_(data)(TENSOR1);                                    \
+          ptrdiff_t iter = 0;\
           if(TENSOR1##Contg){                                    \
             TYPE1 *TENSOR1##_data = NULL;         \
-            ptrdiff_t index = 0;\
-            ptrdiff_t iter = 0;\
-            ptrdiff_t dim = 0;\
             PRAGMA2( omp parallel for if (TENSOR1##Size > TH_OMP_OVERHEAD_THRESHOLD_COPY) private(TENSOR1##_data,  iter) reduction(OPERATION) ) \
             for (iter = 0; iter < TENSOR1##Size; iter++) {\
               TENSOR1##_data = rp+iter;\
               CODE                                \
             }\
           } else { \
-            ptrdiff_t TENSOR1##BasicIndex = 0;\
-            TYPE1 *TENSOR1##_data = NULL;         \
-            ptrdiff_t index = 0;\
-            ptrdiff_t iter = 0;\
-            ptrdiff_t dim = 0;\
-            PRAGMA2( omp parallel for if (TENSOR1##Size > TH_OMP_OVERHEAD_THRESHOLD_COPY) private(TENSOR1##BasicIndex, TENSOR1##_data, index, iter, dim) reduction(OPERATION) ) \
+            PRAGMA2( omp parallel for if (TENSOR1##Size > TH_OMP_OVERHEAD_THRESHOLD_COPY) reduction(OPERATION) ) \
             for (iter = 0; iter < TENSOR1##Size; iter++) {\
-              TENSOR1##BasicIndex = 0;\
-              for(dim = 0; dim < TENSOR1##Dim-1; dim++) {\
-                index = (iter%TENSOR1##Stride[dim])/TENSOR1##Stride[dim+1];\
-                TENSOR1##BasicIndex += index*TENSOR1->stride[dim];\
-              }\
-              index = iter%TENSOR1##Stride[dim];\
-              TENSOR1##BasicIndex += index*TENSOR1->stride[dim];\
-              TENSOR1##_data = rp+TENSOR1##BasicIndex;\
+              ptrdiff_t TENSOR1##BasicIndex = SearchingIndex(iter, TENSOR1->stride, TENSOR1##Dim, TENSOR1->size);\
+              TYPE1 * TENSOR1##_data = rp+TENSOR1##BasicIndex;\
               CODE                                \
             }\
           }\
@@ -263,7 +250,7 @@ extern ptrdiff_t SearchingIndex(ptrdiff_t index, long *stride, long dim, long* s
     ptrdiff_t strideSomeDim = 1;                                              \
     int dim;                                                                  \
     for (dim = TENSOR2##Dim; dim > 0; dim--){                                 \
-      if(0 == TENSOR2->stride[dim]) {                                         \
+      if(0 == TENSOR2->stride[dim-1]) {                                         \
         TENSOR2##StrideContg = 0;                                             \
         break;                                               \
       }                                                                        \
@@ -273,7 +260,7 @@ extern ptrdiff_t SearchingIndex(ptrdiff_t index, long *stride, long dim, long* s
                                                                               \
     strideSomeDim = 1;                                                        \
     for (dim = TENSOR1##Dim; dim > 0; dim--){                                 \
-      if(0 == TENSOR1->stride[dim])  {                                         \
+      if(0 == TENSOR1->stride[dim-1])  {                                         \
         TENSOR1##StrideContg = 0;                                              \
         break;                                                                \
       }                                                                       \
@@ -395,14 +382,14 @@ extern ptrdiff_t SearchingIndex(ptrdiff_t index, long *stride, long dim, long* s
                                                                               \
     int dim;                                                                  \
     for (dim = TENSOR2##Dim; dim > 0; dim--){                                 \
-      if(0 == TENSOR2->stride[dim]) {                                         \
+      if(0 == TENSOR2->stride[dim-1]) {                                         \
         TENSOR2##StrideContg = 0;                                             \
         break;                                               \
       }                                                                        \
     }                                                                         \
                                                                               \
     for (dim = TENSOR1##Dim; dim > 0; dim--){                                 \
-      if(0 == TENSOR1->stride[dim])  {                                         \
+      if(0 == TENSOR1->stride[dim-1])  {                                         \
         TENSOR1##StrideContg = 0;                                              \
         break;                                                                \
       }                                                                       \
@@ -424,6 +411,7 @@ extern ptrdiff_t SearchingIndex(ptrdiff_t index, long *stride, long dim, long* s
           }\
         } else {\
           PRAGMA2( omp parallel for if (SIZE > TH_OMP_OVERHEAD_THRESHOLD_COPY)  )  \
+          PRAGMA2(simd) \
           for (iter = 0; iter < SIZE; iter++) {\
             TYPE2* TENSOR2##_data = tp+iter;\
             TYPE1* TENSOR1##_data = rp+iter;\
@@ -484,19 +472,19 @@ extern ptrdiff_t SearchingIndex(ptrdiff_t index, long *stride, long dim, long* s
                                                                               \
     int dim;                                                                  \
     for (dim = TENSOR1##Dim; dim > 0; dim--){                                 \
-      if(0 == TENSOR1->stride[dim])  {                                        \
+      if(0 == TENSOR1->stride[dim-1])  {                                        \
         TENSOR1##StrideContg = 0;                                             \
         break;                                                                \
       }                                                                       \
     }                                                                         \
     for (dim = TENSOR2##Dim; dim > 0; dim--){                                 \
-      if(0 == TENSOR2->stride[dim]) {                                         \
+      if(0 == TENSOR2->stride[dim-1]) {                                         \
         TENSOR2##StrideContg = 0;                                             \
         break;                                                                \
       }                                                                       \
     }                                                                         \
     for (dim = TENSOR3##Dim; dim > 0; dim--){                                 \
-      if(0 == TENSOR3->stride[dim]) {                                         \
+      if(0 == TENSOR3->stride[dim-1]) {                                         \
         TENSOR3##StrideContg = 0;                                             \
         break;                                                                \
       }                                                                       \

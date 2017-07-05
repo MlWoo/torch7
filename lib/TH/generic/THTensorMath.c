@@ -2111,8 +2111,6 @@ void THTensor_(min)(THTensor *values_, THLongTensor *indices_, THTensor *t, int 
     THLongTensor_squeeze1d(indices_, indices_, dimension);
   }
 }
-
-
 void THTensor_(sum)(THTensor *r_, THTensor *t, int dimension, int keepdim)
 {
   THLongStorage *dim;
