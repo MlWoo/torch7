@@ -1,6 +1,7 @@
 #include "THBlas.h"
 
 #include "generic/gemm4.c"
+#include "generic/gemm12.c"
 
 #include "generic/THBlas.c"
 #include "THGenerateAllTypes.h"

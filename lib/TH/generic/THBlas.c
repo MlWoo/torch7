@@ -374,12 +374,16 @@ void THBlas_(gemm)(char transa, char transb, long m, long n, long k, real alpha,
     sgemm_(&transa, &transb, &i_m, &i_n, &i_k, &alpha, a, &i_lda, b, &i_ldb, &beta, c, &i_ldc);
     }
 #else
-    if(transa=='n' && transb=='n' && i_m==500 && i_n==64 && i_k==2000)
+    if( (transa=='n' && transb=='n' && i_m==500 && i_n==64 && i_k==2000)
+        || (transa=='n' && transb=='n' && i_m==1000 && i_n==64 && i_k==2000) )
     {
         //printf("opt gemm4 code");
         sgemm4_opt(&transa, &transb, &i_m, &i_n, &i_k, &alpha, a, &i_lda, b, &i_ldb, &beta, c, &i_ldc);
     }
-
+    else if(transa=='n' && transb=='n' && i_m==500 && i_n <= 48  && i_k==1)
+    {
+        sgemm12_opt(&transa, &transb, &i_m, &i_n, &i_k, &alpha, a, &i_lda, b, &i_ldb, &beta, c, &i_ldc);
+    }
     else
     {
 

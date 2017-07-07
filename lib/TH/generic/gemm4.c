@@ -2,12 +2,11 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <assert.h>
-#include <omp.h>
-#include <mkl.h>
-#include <immintrin.h>
+#include "omp.h"
+#include "mkl.h"
+#include "immintrin.h"
 
 typedef unsigned long long int uint64_t;
-
 extern  __m512  _mm512_4fmadd_ps (__m512 __A, __m512 __B, __m512 __C,__m512 __D, __m512 __E, __m128 *__F);
 
 static inline void
@@ -16,7 +15,7 @@ sgemm_opt(const uint64_t m, const uint64_t n, const uint64_t p,
           const float pBeta, float * restrict C)
 {
 
-#define LI (16)
+#define LI (32)
 #define LJ (16)
 #define LK (2000)
 
