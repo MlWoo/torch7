@@ -1,6 +1,10 @@
 #include "THGeneral.h"
 #include "THAtomic.h"
 
+#include "mkl.h"
+#define MKL_MALLOC  0
+
+
 #ifdef _OPENMP
 #include <omp.h>
 #endif
@@ -159,6 +163,7 @@ void THSetGCHandler( void (*torchGCFunction_)(void *data), void *data )
 
 /* it is guaranteed the allocated size is not bigger than PTRDIFF_MAX */
 static ptrdiff_t getAllocSize(void *ptr) {
+
 #if defined(__unix) && defined(HAVE_MALLOC_USABLE_SIZE)
   return malloc_usable_size(ptr);
 #elif defined(__APPLE__)
@@ -227,7 +232,18 @@ static void* THAllocInternal(ptrdiff_t size)
 {
   void *ptr;
 
-  if (size > 5120)
+  if(size > 4096)
+  {
+    printf("THAllocInternal size > 4k \n");
+#if MKL_MALLOC
+    //ptr = aligned_alloc(2*1024*1024, size);
+    ptr = mkl_malloc(size, 2* 1024 * 1024);
+    printf("THAllocInternal size > 4k end \n");
+#else
+    ptr = malloc(size);
+#endif
+  }
+  else if (size > 5120)
   {
 #if (defined(__unix) || defined(__APPLE__)) && (!defined(DISABLE_POSIX_MEMALIGN))
     if (posix_memalign(&ptr, 64, size) != 0)
@@ -245,7 +261,7 @@ static void* THAllocInternal(ptrdiff_t size)
     ptr = malloc(size);
   }
 
-  THHeapUpdate(getAllocSize(ptr));
+  THHeapUpdate(size);
   return ptr;
 }
 
