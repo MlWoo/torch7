@@ -261,33 +261,42 @@ static int torch_stopLogFile(lua_State *L)
   return 0;
 }
 
-float start_log()
+long start_log()
 {
   if (GLB_LOG_ENABLE) {
     struct timeval clock_v;
     gettimeofday(&clock_v, NULL);
-    return (clock_v.tv_sec*1000 + (float)clock_v.tv_sec/1000);
+    return (clock_v.tv_sec*1000000 + clock_v.tv_usec);
   }
   return 0;
 }
 
-void end_log2(float start_time, long size1, long size2, int contig1, int contig2,  const char* func_name, char* source_file_name)
+void end_log1(long start_time, long size1, int contig1, const char* func_name, char* source_file_name)
 {
-  if (GLB_LOG_ENABLE) {
-    struct timeval clock_v;
-    gettimeofday(&clock_v, NULL);
-    float interval = (clock_v.tv_sec*1000 + (float)clock_v.tv_sec/1000) - start_time;
-    fprintf(fp, "time: %10f\tsize1:%10ld\tsize2:%10ld\tcontig1:%2d\tcontig2:%2d\tfunc:%s\tfile:%s\n", interval, size1, size2, contig1, contig2, func_name, source_file_name);   
-  }
+    if(GLB_LOG_ENABLE){
+        struct timeval clock_v;
+        gettimeofday(&clock_v, NULL);
+        long interval = clock_v.tv_sec*1000000 + clock_v.tv_usec - start_time;
+        fprintf(fp, "time: %10ld\tsize1: %10ld\tcontig1: %2d\tfunc: %s\tfile: %s\n", interval, size1, contig1, func_name, source_file_name);   
+    }
 }
 
-void end_log3(float start_time, long size1, long size2, long size3, int contig1, int contig2, int contig3, const char* func_name, char* source_file_name)
+void end_log2(long start_time, long size1, long size2, int contig1, int contig2,  const char* func_name, char* source_file_name)
 {
   if (GLB_LOG_ENABLE) {
     struct timeval clock_v;
     gettimeofday(&clock_v, NULL);
-    float interval = (clock_v.tv_sec*1000 + (float)clock_v.tv_sec/1000) - start_time;
-    fprintf(fp, "time: %10f\tsize1:%10ld\tsize2:%10ld\tsize3:%10ld\tcontig1:%2d\tcontig2:%2d\tcontig3:%2d\tfunc:%s\tfile:%s\n", interval, size1, size2, size3, contig1, contig2, contig3, func_name, source_file_name);    
+    long interval = clock_v.tv_sec*1000000 + clock_v.tv_usec - start_time;   
+    fprintf(fp, "time: %10ld\tsize1: %10ld\tsize2: %10ld\tcontig1: %2d\tcontig2: %2d\tfunc: %s\tfile: %s\n", interval, size1, size2, contig1, contig2, func_name, source_file_name);   
+  }}
+
+void end_log3(long start_time, long size1, long size2, long size3, int contig1, int contig2, int contig3, const char* func_name, char* source_file_name)
+{
+  if (GLB_LOG_ENABLE) {
+    struct timeval clock_v;
+    gettimeofday(&clock_v, NULL);
+    long interval = clock_v.tv_sec*1000000 + clock_v.tv_usec - start_time;
+    fprintf(fp, "time: %10ld\tsize1: %10ld\tsize2: %10ld\tsize3: %10ld\tcontig1: %2d\tcontig2: %2d\tcontig3: %2d\tfunc: %s\tfile: %s\n", interval, size1, size2, size3, contig1, contig2, contig3, func_name, source_file_name);    
   }
 }
 
