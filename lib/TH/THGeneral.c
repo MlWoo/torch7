@@ -234,8 +234,9 @@ static void* THAllocInternal(ptrdiff_t size)
 
   if(size > 4096)
   {
-    printf("THAllocInternal size > 4k \n");
+
 #if MKL_MALLOC
+    printf("THAllocInternal size > 4k \n");
     //ptr = aligned_alloc(2*1024*1024, size);
     ptr = mkl_malloc(size, 2* 1024 * 1024);
     printf("THAllocInternal size > 4k end \n");
