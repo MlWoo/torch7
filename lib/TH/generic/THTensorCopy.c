@@ -39,7 +39,6 @@ void THTensor_(copy2)(THTensor *tensor, THTensor *src)
 
 void THTensor_(copy)(THTensor *tensor, THTensor *src)
 {
-  float st = start_log();
   ptrdiff_t tensorSize = THTensor_(nElement)(tensor);                     
   ptrdiff_t srcSize = THTensor_(nElement)(src);                     
   int tensorContig = THTensor_(isContiguous)(tensor)? 1:0;                 
@@ -77,7 +76,6 @@ void THTensor_(copy)(THTensor *tensor, THTensor *src)
   } else {
     TH_TENSOR_APPLY2(real, tensor, real, src, *tensor_data = *src_data;)
   }
-  end_log2(st, tensorSize, srcSize, tensorContig, srcContig, __FUNCTION__, __FILE__);
 }
 
 
