@@ -18,10 +18,10 @@ SET(MKLML_LIBRARIES)
 
 IF(WITH_IOMP)
   SET(mklml_lib_list
-      mklml_intel iomp5 )
+      mkl_rt mklml_intel iomp5 )
 ELSE(WITH_IOMP)
   SET(mklml_lib_list
-      mklml_gnu )
+      mkl_rt mklml_gnu )
 ENDIF(WITH_IOMP)
 
 SET(mklml_header_list mkl_blas.h i_malloc.h mkl_cblas.h mkl_dnn_types.h mkl_service.h mkl_trans.h mkl_types.h mkl_version.h mkl_vml_defines.h mkl_vml_functions.h mkl_vml.h mkl_vml_types.h mkl_vsl_defines.h mkl_vsl_functions.h mkl_vsl.h mkl_vsl_types.h)
@@ -61,17 +61,18 @@ if(NOT MKLML_ROOT_DIR OR NOT EXISTS ${MKLML_ROOT_DIR}/include/mkldnn.h OR NOT EX
     endif()
     set(ENV_MKLML "$ENV{MKLML_ROOT}")
     if(ENV_MKLML)
-
         list(APPEND mklml_root_paths ${ENV_MKLML})
     endif()
     if(UNIX)
         list(APPEND mklml_root_paths "/opt/intel/mklml")
     endif()
     find_path(MKLML_ROOT_DIR include/mkl_dnn.h include/mkl_cblas.h include/mkl_blas.h PATHS ${mklml_root_paths})
+
 endif()
 
 if(MKLML_ROOT_DIR)
     set(MKLML_INCLUDE_DIRS ${MKLML_ROOT_DIR}/include)
+
     GET_MKLML_VERSION(${MKLML_INCLUDE_DIRS}/mkl_version.h)    
     if(${MKLML_VERSION_STR} VERSION_GREATER "17.0.0" OR ${MKLML_VERSION_STR} VERSION_EQUAL "17.0.0")
         set(mklml_lib_find_paths
@@ -85,15 +86,15 @@ if(MKLML_ROOT_DIR)
     
     set(MKLML_LIBRARIES "")
     foreach(lib ${mklml_lib_list})
-        FIND_LIBRARY(${lib} ${lib} ${mklml_lib_find_paths})
+        FIND_LIBRARY(${lib} ${lib}  HINTS ${mklml_lib_find_paths}  NO_CMAKE_ENVIRONMENT_PATH)
         MARK_AS_ADVANCED(${lib})
         list(APPEND MKLML_LIBRARIES ${${lib}})
     endforeach()
-
+    
     # Include files
     set(MKLML_INCLUDE_DIR "")
     FOREACH(header ${mklml_header_list})
-       FIND_PATH(${header} ${header} HINTS ${mklml_header_find_paths})
+       FIND_PATH(${header} ${header} HINTS ${mklml_header_find_paths} NO_CMAKE_ENVIRONMENT_PATH)
        MARK_AS_ADVANCED(${header})
        IF(${header})
          set(MKLML_INCLUDE_DIR ${${header}})
