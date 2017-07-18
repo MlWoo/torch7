@@ -16,7 +16,7 @@ inline unsigned int RandInt( RNG* rng )
     return (unsigned long)temp;
 }
 
-ptrdiff_t SearchingIndex(ptrdiff_t index, long *stride, long dim, long* size)
+inline ptrdiff_t SearchingIndex(ptrdiff_t index, long *stride, long dim, long* size)
 {
   ptrdiff_t i = 0;
   ptrdiff_t rem;
