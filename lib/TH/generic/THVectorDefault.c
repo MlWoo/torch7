@@ -4,6 +4,28 @@
 
 void THVector_(copy_DEFAULT)(real *x, const real *y, const ptrdiff_t n) {
   ptrdiff_t i = 0;
+#if defined(TH_REAL_IS_BYTE)
+#ifdef _OPENMP
+  int omp_flag = omp_in_parallel();
+  #pragma omp parallel for if ( (n > TH_OMP_OVERHEAD_THRESHOLD_VEC) && ( 0 == omp_flag) )
+#endif
+#endif
+  for(i = 0; i <n-4; i+=4)
+  {
+    x[i] = y[i];
+    x[i+1] = y[i+1];
+    x[i+2] = y[i+2];
+    x[i+3] = y[i+3];
+  }
+#if defined(TH_REAL_IS_BYTE)
+  i = n - (n%4);
+#endif
+  for(; i < n; i++)
+    x[i] = y[i];
+}
+
+void THVector_(copy2_DEFAULT)(real *x, const real *y, const ptrdiff_t n) {
+  ptrdiff_t i = 0;
 
   for(; i <n-4; i+=4)
   {
