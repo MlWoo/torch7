@@ -50,14 +50,14 @@ void THTensor_(bernoulli)(THTensor *self, THGenerator *_generator, double p)
   real *r = THTensor_(data)(self);
   int nthr = omp_get_max_threads();
   int *tmp = (int*)malloc(n*sizeof(int));
-  #pragma omp parallel num_threads(nthr) private(n)
+  #pragma omp parallel num_threads(nthr) 
   {
-    int i; 
+    int i;
     const int ithr = omp_get_thread_num();
     const int avg_amount = (n + nthr - 1) / nthr;
     const int seg_offset = ithr * avg_amount;
-    int seg_last_index = seg_offset + avg_amount;
-    seg_last_index = seg_last_index <= n ? seg_last_index:n;
+    const int seg_last_index_tmp = seg_offset + avg_amount;
+    const int seg_last_index = seg_last_index_tmp <= n ? seg_last_index_tmp:n;
     const int seg_amount = seg_last_index - seg_offset;
          
     if (seg_amount > 0) {
@@ -66,11 +66,12 @@ void THTensor_(bernoulli)(THTensor *self, THGenerator *_generator, double p)
       vslSkipAheadStream(stream, seg_offset);
       viRngBernoulli(VSL_RNG_METHOD_BERNOULLI_ICDF, stream, seg_amount, tmp+seg_offset, p);
       vslDeleteStream(&stream);
-      for (i = seg_offset; i < seg_last_index; i++) {
-        r[i] = tmp[i];
-      } 
+      for(i = seg_offset; i < seg_last_index; i++) {
+        r[i]=tmp[i];
+      }
     }
   }
+
   free(tmp);
 
 }
