@@ -49,34 +49,27 @@ void THTensor_(bernoulli)(THTensor *self, THGenerator *_generator, double p)
   int n = THTensor_(nElement)(self);
   real *r = THTensor_(data)(self);
   int nthr = omp_get_max_threads();
-
   int *tmp = (int*)malloc(n*sizeof(int));
-
-  #pragma omp parallel num_threads(nthr)
-  { 
+  #pragma omp parallel num_threads(nthr) private(n)
+  {
+    int i; 
     const int ithr = omp_get_thread_num();
     const int avg_amount = (n + nthr - 1) / nthr;
-    const int my_offset = ithr * avg_amount;
-    const int my_index = my_offset + avg_amount;
-    const int my_index_min = my_index <= n ? my_index:n;
-    const int my_amount = my_index_min - my_offset;
+    const int seg_offset = ithr * avg_amount;
+    int seg_last_index = seg_offset + avg_amount;
+    seg_last_index = seg_last_index <= n ? seg_last_index:n;
+    const int seg_amount = seg_last_index - seg_offset;
          
-    if (my_amount > 0) {
+    if (seg_amount > 0) {
       VSLStreamStatePtr stream;
       vslNewStream(&stream, VSL_BRNG_MCG31, seedNew);
-      vslSkipAheadStream(stream, my_offset);
-      viRngBernoulli(VSL_RNG_METHOD_BERNOULLI_ICDF, stream, my_amount, tmp + my_offset, p);
+      vslSkipAheadStream(stream, seg_offset);
+      viRngBernoulli(VSL_RNG_METHOD_BERNOULLI_ICDF, stream, seg_amount, tmp+seg_offset, p);
       vslDeleteStream(&stream);
+      for (i = seg_offset; i < seg_last_index; i++) {
+        r[i] = tmp[i];
+      } 
     }
-  }
-  int i;
-#ifdef _OPENMP
-  int omp_flag = omp_in_parallel();
-  #pragma omp parallel for if ( (n > TH_OMP_OVERHEAD_THRESHOLD_VEC_AVX512) && ( 0 == omp_flag) )private (i)  
-#endif
-  for(i=0;i<n;i++)
-  {
-    r[i]=tmp[i];
   }
   free(tmp);
 

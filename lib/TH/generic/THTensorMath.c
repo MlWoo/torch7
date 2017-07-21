@@ -122,13 +122,8 @@
   CODE \
 }
 #endif
-extern long start_log();
-extern void end_log1(long start_time, long size1, int contig1, const char* func_name, char* source_file_name);
-extern void end_log2(long start_time, long size1, long size2, int contig1, int contig2, const char* func_name, char* source_file_name);
-extern void end_log3(long start_time, long size1, long size2, long size3, int contig1, int contig2, int contig3, const char* func_name, char* source_file_name);
 void THTensor_(fill)(THTensor *r_, real value)
 {
-  long start_time = start_log();
   int contig1 = 0;
   if (THTensor_(isContiguous)(r_) || THTensor_(isTransposed)(r_)) {
     contig1 = 1;
@@ -145,7 +140,6 @@ void THTensor_(fill)(THTensor *r_, real value)
       }
       );
   }
-  end_log1(start_time, THTensor_(nElement)(r_), contig1, __FUNCTION__, __FILE__);
 }
 
 void THTensor_(zero)(THTensor *r_)
@@ -155,9 +149,6 @@ void THTensor_(zero)(THTensor *r_)
 
 void THTensor_(maskedFill)(THTensor *tensor, THByteTensor *mask, real value)
 {
-//  if (THTensor_(isContiguous)(tensor) && THTensor_(isContiguous)(mask) && THTensor_(nElement)(tensor) == THTensor_(nElement)(makse)){
-  
-
   TH_TENSOR_APPLY2(real, tensor, unsigned char, mask,
                    if (*mask_data > 1)
                    {
@@ -306,7 +297,6 @@ void THTensor_(indexCopyDetail)(THTensor *tensor, int dimIndex, THTensor *src)
 
 void THTensor_(indexSelect)(THTensor *tensor, THTensor *src, int dim, THLongTensor *index)
 {
-  long start_time = start_log();
   ptrdiff_t i, numel;
   THLongStorage *newSize;
   THTensor *tSlice, *sSlice;
@@ -384,13 +374,11 @@ void THTensor_(indexSelect)(THTensor *tensor, THTensor *src, int dim, THLongTens
   }
 
   THLongTensor_free(index);
-  end_log2(start_time, THTensor_(nElement)(src), THTensor_(nElement)(tensor), THTensor_(isContiguous)(src), THTensor_(isContiguous)(tensor),  __FUNCTION__, __FILE__);
 }
 
 
 void THTensor_(indexCopy)(THTensor *tensor, int dim, THLongTensor *index, THTensor *src)
 {
-  long start_time = start_log();
   ptrdiff_t i, numel;
   THTensor *tSlice, *sSlice;
   long *index_data;
@@ -430,7 +418,6 @@ void THTensor_(indexCopy)(THTensor *tensor, int dim, THLongTensor *index, THTens
     }
   }
   THLongTensor_free(index);
-  end_log2(start_time, THTensor_(nElement)(src), THTensor_(nElement)(tensor), THTensor_(isContiguous)(src), THTensor_(isContiguous)(tensor),  __FUNCTION__, __FILE__);
 }
 
 void THTensor_(indexAddDetail)(THTensor *tensor, int dimIndex, THTensor *src)
@@ -469,7 +456,6 @@ void THTensor_(indexAddDetail)(THTensor *tensor, int dimIndex, THTensor *src)
 
 void THTensor_(indexAdd)(THTensor *tensor, int dim, THLongTensor *index, THTensor *src)
 {
-  long start_time = start_log();
   ptrdiff_t i, numel;
   THTensor *tSlice, *sSlice;
   long *index_data;
@@ -511,12 +497,10 @@ void THTensor_(indexAdd)(THTensor *tensor, int dim, THLongTensor *index, THTenso
     }
   }
   THLongTensor_free(index);
-  end_log2(start_time, THTensor_(nElement)(src), THTensor_(nElement)(tensor), THTensor_(isContiguous)(src), THTensor_(isContiguous)(tensor),  __FUNCTION__, __FILE__);
 }
 
 void THTensor_(indexFill)(THTensor *tensor, int dim, THLongTensor *index, real val)
 {
-  long start_time = start_log();
   ptrdiff_t i, numel;
   THTensor *tSlice;
   long *index_data;
@@ -543,7 +527,6 @@ void THTensor_(indexFill)(THTensor *tensor, int dim, THLongTensor *index, real v
     }
   }
   THLongTensor_free(index);
-  end_log1(start_time, THTensor_(nElement)(tensor), THTensor_(isContiguous)(tensor),  __FUNCTION__, __FILE__);
 }
 
 void THTensor_(gather)(THTensor *tensor, THTensor *src, int dim, THLongTensor *index)
@@ -689,7 +672,6 @@ real THTensor_(maxall)(THTensor *tensor)
 
 accreal THTensor_(sumall)(THTensor *tensor)
 {
-  long start_time = start_log();
   int tensorContig = THTensor_(isContiguous)(tensor)? 1:0;        
   ptrdiff_t tensorSize = THTensor_(nElement)(tensor);     
 
@@ -699,9 +681,8 @@ accreal THTensor_(sumall)(THTensor *tensor)
   TH_TENSOR_APPLY_REDUCTION_ADVANCED_INDEX(real, tensor, +:sum, sum += *tensor_data;);
 #else
   TH_TENSOR_APPLY(real, tensor, sum += *tensor_data;);
-  #endif
+#endif
   
-  end_log1(start_time, tensorSize, tensorContig, __FUNCTION__, __FILE__);
   return sum;
 }
 
@@ -719,7 +700,6 @@ accreal THTensor_(prodall)(THTensor *tensor)
 
 void THTensor_(add)(THTensor *r_, THTensor *t, real value)
 {
-  long start_time = start_log();
   THTensor_(resizeAs)(r_, t);    
   ptrdiff_t r_Size = THTensor_(nElement)(r_);                     
   ptrdiff_t tSize = THTensor_(nElement)(t);                     
@@ -738,9 +718,6 @@ void THTensor_(add)(THTensor *r_, THTensor *t, real value)
   } else {
     TH_TENSOR_APPLY2(real, r_, real, t, *r__data = *t_data + value;);
   }
-  
-  end_log2(start_time, tSize, r_Size, tContig, r_Contig, __FUNCTION__, __FILE__);
-
 }
 
 void THTensor_(sub)(THTensor *r_, THTensor *t, real value)
@@ -750,7 +727,6 @@ void THTensor_(sub)(THTensor *r_, THTensor *t, real value)
 
 void THTensor_(mul)(THTensor *r_, THTensor *t, real value)
 {
-  long start_time = start_log();
   THTensor_(resizeAs)(r_, t);
   ptrdiff_t r_Size = THTensor_(nElement)(r_);                     
   ptrdiff_t tSize = THTensor_(nElement)(t);                     
@@ -769,14 +745,10 @@ void THTensor_(mul)(THTensor *r_, THTensor *t, real value)
   } else {
     TH_TENSOR_APPLY2(real, r_, real, t, *r__data = *t_data * value;);
   }
-  
-  end_log2(start_time, tSize, r_Size, tContig, r_Contig, __FUNCTION__, __FILE__);
-  
 }
 
 void THTensor_(div)(THTensor *r_, THTensor *t, real value)
 {
-  long start_time = start_log();
   THTensor_(resizeAs)(r_, t);
   ptrdiff_t r_Size = THTensor_(nElement)(r_);                     
   ptrdiff_t tSize = THTensor_(nElement)(t);                     
@@ -795,9 +767,6 @@ void THTensor_(div)(THTensor *r_, THTensor *t, real value)
   } else {
     TH_TENSOR_APPLY2(real, r_, real, t, *r__data = *t_data / value;);
   }
-  
-  end_log2(start_time, tSize, r_Size, tContig, r_Contig, __FUNCTION__, __FILE__);
-  
 }
 
 void THTensor_(lshift)(THTensor *r_, THTensor *t, real value)
@@ -1131,7 +1100,6 @@ void THTensor_(clamp)(THTensor *r_, THTensor *t, real min_value, real max_value)
 //hallo3
 void THTensor_(cadd)(THTensor *r_, THTensor *t, real value, THTensor *src)
 {
-  long start_time = start_log();
   THTensor_(resizeAs)(r_, t);
   ptrdiff_t r_Size = THTensor_(nElement)(r_);                     
   ptrdiff_t srcSize = THTensor_(nElement)(src);
@@ -1152,9 +1120,6 @@ void THTensor_(cadd)(THTensor *r_, THTensor *t, real value, THTensor *src)
   } else {
     TH_TENSOR_APPLY3(real, r_, real, t, real, src, *r__data = *t_data + value * *src_data;);  
   }
-  
-  end_log3(start_time, tSize, srcSize, r_Size, tContig, srcContig, r_Contig, __FUNCTION__, __FILE__);
-  
 }
 
 void THTensor_(csub)(THTensor *r_, THTensor *t, real value,THTensor *src)
@@ -1164,7 +1129,6 @@ void THTensor_(csub)(THTensor *r_, THTensor *t, real value,THTensor *src)
 
 void THTensor_(cmul)(THTensor *r_, THTensor *t, THTensor *src)
 {
-  long start_time = start_log();
   THTensor_(resizeAs)(r_, t);
   ptrdiff_t r_Size = THTensor_(nElement)(r_);                     
   ptrdiff_t srcSize = THTensor_(nElement)(src);
@@ -1187,9 +1151,6 @@ void THTensor_(cmul)(THTensor *r_, THTensor *t, THTensor *src)
   } else {
       TH_TENSOR_APPLY3(real, r_, real, t, real, src, *r__data = *t_data * *src_data;);
   }
-  
-  end_log3(start_time, tSize, srcSize, r_Size, tContig, srcContig, r_Contig, __FUNCTION__, __FILE__);
-  
 }
 
 void THTensor_(cpow)(THTensor *r_, THTensor *t, THTensor *src)
@@ -1224,7 +1185,6 @@ void THTensor_(cpow)(THTensor *r_, THTensor *t, THTensor *src)
 
 void THTensor_(cdiv)(THTensor *r_, THTensor *t, THTensor *src)
 {
-  long start_time = start_log();
   THTensor_(resizeAs)(r_, t);
   ptrdiff_t r_Size = THTensor_(nElement)(r_);                     
   ptrdiff_t srcSize = THTensor_(nElement)(src);  
@@ -1245,9 +1205,6 @@ void THTensor_(cdiv)(THTensor *r_, THTensor *t, THTensor *src)
   } else {
       TH_TENSOR_APPLY3(real, r_, real, t, real, src, *r__data = *t_data / *src_data;);
   }
-  
-  end_log3(start_time, tSize, srcSize, r_Size, tContig, srcContig, r_Contig, __FUNCTION__, __FILE__);
-  
 }
 
 void THTensor_(clshift)(THTensor *r_, THTensor *t, THTensor *src)
@@ -1629,7 +1586,6 @@ void THTensor_(tpow)(THTensor *r_, real value, THTensor *t)
 
 void THTensor_(addcmul)(THTensor *r_, THTensor *t, real value, THTensor *src1, THTensor *src2)
 {
-  long start_time = start_log();
   if(r_ != t)
   {
     THTensor_(resizeAs)(r_, t);
@@ -1651,13 +1607,11 @@ void THTensor_(addcmul)(THTensor *r_, THTensor *t, real value, THTensor *src1, T
   } else {
     TH_TENSOR_APPLY3(real, r_, real, src1, real, src2, *r__data += value * *src1_data * *src2_data;);  
   }
-  end_log3(start_time, src1Size, src2Size, r_Size, src1Contig, src2Contig, r_Contig, __FUNCTION__, __FILE__);
 }
 
 
 void THTensor_(addcdiv)(THTensor *r_, THTensor *t, real value, THTensor *src1, THTensor *src2)
 {
-  long start_time = start_log();
   if(r_ != t)
   {
     THTensor_(resizeAs)(r_, t);
@@ -1678,9 +1632,6 @@ void THTensor_(addcdiv)(THTensor *r_, THTensor *t, real value, THTensor *src1, T
   } else {
     TH_TENSOR_APPLY3(real, r_, real, src1, real, src2, *r__data += value * *src1_data / *src2_data;);
   }
-
-  end_log3(start_time, src1Size, src2Size, r_Size, src1Contig, src2Contig, r_Contig, __FUNCTION__, __FILE__);
-  
 }
 
 void THTensor_(addmv)(THTensor *r_, real beta, THTensor *t, real alpha, THTensor *mat, THTensor *vec)
@@ -2297,7 +2248,6 @@ void THTensor_(min)(THTensor *values_, THLongTensor *indices_, THTensor *t, int 
 }
 void THTensor_(sum)(THTensor *r_, THTensor *t, int dimension, int keepdim)
 {
-  long start_time = start_log();
   THLongStorage *dim;
 
   THArgCheck(dimension >= 0 && dimension < THTensor_(nDimension)(t), 2, "dimension %d out of range",
@@ -2308,11 +2258,6 @@ void THTensor_(sum)(THTensor *r_, THTensor *t, int dimension, int keepdim)
   THTensor_(resize)(r_, dim, NULL);
   THLongStorage_free(dim);
 
-  int r_Contig = THTensor_(isContiguous)(r_)? 1:0;
-  int tContig = THTensor_(isContiguous)(t)? 1:0;
-  ptrdiff_t r_Size = THTensor_(nElement)(r_);                     
-  ptrdiff_t tSize = THTensor_(nElement)(t);     
- 
   int oldPath = 0;
   int omp_flag = omp_in_parallel();
   if(0 == omp_flag){
@@ -2350,7 +2295,6 @@ void THTensor_(sum)(THTensor *r_, THTensor *t, int dimension, int keepdim)
       /* for adveanced searching index*/
 
       ptrdiff_t iter = 0;
-      ptrdiff_t dimSize = t->size[dimension];
       ptrdiff_t SIZE = THTensor_(nElement)(r_);
       #pragma omp parallel for if ( SIZE > TH_OMP_OVERHEAD_THRESHOLD)  
       for (iter = 0; iter < SIZE; iter++) {
@@ -2358,7 +2302,6 @@ void THTensor_(sum)(THTensor *r_, THTensor *t, int dimension, int keepdim)
         ptrdiff_t quot;
         ptrdiff_t rem = iter;
         ptrdiff_t tBasicIndex = 0;
-
 
         for(j = 0; j < r_Dim-1; ++j) {
           if(j != dimension){
@@ -2373,7 +2316,7 @@ void THTensor_(sum)(THTensor *r_, THTensor *t, int dimension, int keepdim)
         real *t_data = tp+tBasicIndex;
         real *r__data = rp+iter;
         *r__data = 0;
-        for(j=0; j < dimSize; ++j) {
+        for(j=0; j < t->size[dimension]; ++j) {
           *r__data += *(t_data + j*t->stride[dimension]);
         }
       }
@@ -2406,7 +2349,6 @@ void THTensor_(sum)(THTensor *r_, THTensor *t, int dimension, int keepdim)
   if (!keepdim) {
     THTensor_(squeeze1d)(r_, r_, dimension);
   }
-  end_log2(start_time, tSize, r_Size, tContig, r_Contig, __FUNCTION__, __FILE__);
 }
 
 void THTensor_(sum2)(THTensor *r_, THTensor *t, int dimension, int keepdim)
@@ -3491,7 +3433,6 @@ TENSOR_IMPLEMENT_LOGICAL(ne,!=)
 #define LAB_IMPLEMENT_BASIC_FUNCTION(NAME, CFUNC)             \
   void THTensor_(NAME)(THTensor *r_, THTensor *t)             \
   {                                                           \
-    long start_time = start_log();\
     THTensor_(resizeAs)(r_, t);                               \
     ptrdiff_t r_Size = THTensor_(nElement)(r_);               \
     ptrdiff_t tSize = THTensor_(nElement)(t);                 \
@@ -3503,7 +3444,6 @@ TENSOR_IMPLEMENT_LOGICAL(ne,!=)
     else {                                                                                                        \
       TH_TENSOR_APPLY2(real, r_, real, t, *r__data = CFUNC(*t_data););                                            \
     }                                                                                                             \
-    end_log2(start_time, r_Size, tSize, r_Contig, tContig, __FUNCTION__, __FILE__);                               \
   }                                                                                                               \ 
     
   
@@ -3523,9 +3463,7 @@ TENSOR_IMPLEMENT_LOGICAL(ne,!=)
     ptrdiff_t tSize = THTensor_(nElement)(t);                                                         \
     int r_Contig = THTensor_(isContiguous)(r_)? 1:0;                                                  \
     int tContig = THTensor_(isContiguous)(t)? 1:0;                                                    \
-    long start_time = start_log();                                                                   \
     TH_TENSOR_APPLY2(real, r_, real, t, CODE);                                                        \
-    end_log2(start_time, tSize, r_Size, tContig, r_Contig, __FUNCTION__, __FILE__);                    \
   }                                                                                                   \
   
 
@@ -3542,14 +3480,12 @@ TENSOR_IMPLEMENT_LOGICAL(ne,!=)
     ptrdiff_t tSize = THTensor_(nElement)(t);                           \
     int r_Contig = THTensor_(isContiguous)(r_)? 1:0;                    \
     int tContig = THTensor_(isContiguous)(t)? 1:0;                      \
-    long start_time = start_log();                                     \
     if( (tSize == r_Size) && (r_Size > TH_OMP_OVERHEAD_THRESHOLD) ){                                                     \
       TH_TENSOR_APPLY2_ADVANCED_INDEX2(r_Size, r_Contig, tContig, real, r_, real, t, *r__data = CFUNC(*t_data, value);); \
     }                                                                                                                    \
     else {                                                                                                               \
       TH_TENSOR_APPLY2(real, r_, real, t, *r__data = CFUNC(*t_data, value););                                            \
     }                                                                                                                    \
-    end_log2(start_time, tSize, r_Size, tContig, r_Contig, __FUNCTION__, __FILE__);                    \
   }                                                                                                                      \
   
 #else
@@ -3562,9 +3498,7 @@ TENSOR_IMPLEMENT_LOGICAL(ne,!=)
     ptrdiff_t tSize = THTensor_(nElement)(t);                           \
     int r_Contig = THTensor_(isContiguous)(r_)? 1:0;                    \
     int tContig = THTensor_(isContiguous)(t)? 1:0;                      \
-    long start_time = start_log();                                     \
     TH_TENSOR_APPLY2(real, r_, real, t, *r__data = CFUNC(*t_data, value);); \
-    end_log2(start_time, tSize, r_Size, tContig, r_Contig, __FUNCTION__, __FILE__);                    \
   }                                                                         \
 
 #endif

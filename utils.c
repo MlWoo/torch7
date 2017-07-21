@@ -221,7 +221,7 @@ static int torch_updateerrorhandlers(lua_State *L)
   THSetArgErrorHandler(luaTorchArgErrorHandlerFunction, L);
   return 0;
 }
-
+/*
 int GLB_LOG_ENABLE = 0;
 FILE * fp;
 
@@ -301,7 +301,7 @@ void end_log3(long start_time, long size1, long size2, long size3, int contig1, 
     fprintf(fp, "time: %10ld\tsize1: %10ld\tsize2: %10ld\tsize3: %10ld\tcontig1: %2d\tcontig2: %2d\tcontig3: %2d\tfunc: %25s\tfile: %25s\n", interval, size1, size2, size3, contig1, contig2, contig3, func_name, source_file_name);
   }
 }
-
+*/
 static const struct luaL_Reg torch_utils__ [] = {
   {"getdefaulttensortype", torch_lua_getdefaulttensortype},
   {"isatty", torch_isatty},
@@ -325,9 +325,9 @@ static const struct luaL_Reg torch_utils__ [] = {
   {"pointer", luaT_lua_pointer},
   {"setheaptracking", torch_setheaptracking},
   {"updateerrorhandlers", torch_updateerrorhandlers},
-  {"elementwiseLog",  torch_elementwiseLog},
-  {"startLogFile",  torch_startLogFile},
-  {"stopLogFile",  torch_stopLogFile},
+//  {"elementwiseLog",  torch_elementwiseLog},
+//  {"startLogFile",  torch_startLogFile},
+//  {"stopLogFile",  torch_stopLogFile},
   {NULL, NULL}
 };
 
