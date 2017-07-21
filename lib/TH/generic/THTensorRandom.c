@@ -1,11 +1,11 @@
 #include <mkl_vsl.h>
-#include <sys/time.h>
 #include "random.h"
 
 #ifndef TH_GENERIC_FILE
 #define TH_GENERIC_FILE "generic/THTensorRandom.c"
 #else
 
+#define TH_OMP_OVERHEAD_THRESHOLD_VEC_AVX512 720
 
 void THTensor_(random)(THTensor *self, THGenerator *_generator)
 {
@@ -43,11 +43,7 @@ void THTensor_(bernoulli)(THTensor *self, THGenerator *_generator, double p)
   THArgCheck(p >= 0 && p <= 1, 1, "must be >= 0 and <= 1");
 
   //time as initial seed
-  struct timeval start;
-  gettimeofday(&start,NULL); 
-  long seed = start.tv_sec * 1000 + (double)start.tv_usec/1000;
-
-  RNG  rng = RNGInit(seed);
+  RNG  rng = RNGInit(_generator->the_initial_seed);
   unsigned long seedNew = RandInt(&rng);
   
   int n = THTensor_(nElement)(self);
@@ -56,7 +52,7 @@ void THTensor_(bernoulli)(THTensor *self, THGenerator *_generator, double p)
 
   int *tmp = (int*)malloc(n*sizeof(int));
 
-  # pragma omp parallel num_threads(nthr)
+  #pragma omp parallel num_threads(nthr)
   { 
     const int ithr = omp_get_thread_num();
     const int avg_amount = (n + nthr - 1) / nthr;
@@ -73,10 +69,14 @@ void THTensor_(bernoulli)(THTensor *self, THGenerator *_generator, double p)
       vslDeleteStream(&stream);
     }
   }
-  int k;
-  for(k=0;k<n;k++)
+  int i;
+#ifdef _OPENMP
+  int omp_flag = omp_in_parallel();
+  #pragma omp parallel for if ( (n > TH_OMP_OVERHEAD_THRESHOLD_VEC_AVX512) && ( 0 == omp_flag) )private (i)  
+#endif
+  for(i=0;i<n;i++)
   {
-    r[k]=tmp[k];
+    r[i]=tmp[i];
   }
   free(tmp);
 
