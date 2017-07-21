@@ -39,10 +39,7 @@ void THTensor_(copy2)(THTensor *tensor, THTensor *src)
 
 void THTensor_(copy)(THTensor *tensor, THTensor *src)
 {
-<<<<<<< HEAD
   long start_time = start_log();
-=======
->>>>>>> 59d00055c1b07de84071547960a7c9927b67924f
   ptrdiff_t tensorSize = THTensor_(nElement)(tensor);                     
   ptrdiff_t srcSize = THTensor_(nElement)(src);                     
   int tensorContig = THTensor_(isContiguous)(tensor)? 1:0;                 
@@ -63,8 +60,8 @@ void THTensor_(copy)(THTensor *tensor, THTensor *src)
           rp[i] = sp[i];
         }
       } else {
-        memcpy(rp, sp, srcSize * sizeof(real));  
-      }  
+		memcpy(rp, sp, srcSize * sizeof(real));  
+	  }  
 #else
       memcpy(rp, sp, srcSize * sizeof(real));
 #endif
@@ -76,14 +73,11 @@ void THTensor_(copy)(THTensor *tensor, THTensor *src)
 #else
       TH_TENSOR_APPLY2(real, tensor, real, src, *tensor_data = *src_data;)
 #endif
-    }
+	}
   } else {
     TH_TENSOR_APPLY2(real, tensor, real, src, *tensor_data = *src_data;)
   }
-<<<<<<< HEAD
   end_log2(start_time, tensorSize, srcSize, tensorContig, srcContig, __FUNCTION__, __FILE__);
-=======
->>>>>>> 59d00055c1b07de84071547960a7c9927b67924f
 }
 
 
