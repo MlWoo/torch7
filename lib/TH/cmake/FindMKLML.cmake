@@ -18,10 +18,10 @@ SET(MKLML_LIBRARIES)
 
 IF(WITH_IOMP)
   SET(mklml_lib_list
-      mkl_rt mklml_intel iomp5 )
+      mklml_intel iomp5 )
 ELSE(WITH_IOMP)
   SET(mklml_lib_list
-      mkl_rt mklml_gnu )
+      mklml_gnu )
 ENDIF(WITH_IOMP)
 
 SET(mklml_header_list mkl_blas.h i_malloc.h mkl_cblas.h mkl_dnn_types.h mkl_service.h mkl_trans.h mkl_types.h mkl_version.h mkl_vml_defines.h mkl_vml_functions.h mkl_vml.h mkl_vml_types.h mkl_vsl_defines.h mkl_vsl_functions.h mkl_vsl.h mkl_vsl_types.h)
