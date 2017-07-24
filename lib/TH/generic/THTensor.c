@@ -604,6 +604,23 @@ int THTensor_(isContiguous)(const THTensor *self)
   return 1;
 }
 
+int THTensor_(contiguousDim)(const THTensor *self)
+{
+  long z = 1;
+  int d;
+  for(d = self->nDimension-1; d >= 0; d--)
+  {
+    if(self->size[d] != 1)
+    {
+      if(self->stride[d] == z)
+        z *= self->size[d];
+      else
+        break;
+    }
+  }
+  return d;
+}
+
 int THTensor_(isSize)(const THTensor *self, const THLongStorage *dims)
 {
   int d;
