@@ -28,6 +28,11 @@ SET(MKL_CDFT_LIBRARIES)
 INCLUDE(CheckTypeSize)
 INCLUDE(CheckFunctionExists)
 
+set(ENV_MKL "$ENV{MKLROOT}")
+if(ENV_MKL)
+    list(APPEND mkl_root_paths ${ENV_MKL})
+endif()
+
 # Intel Compiler Suite
 SET(INTEL_COMPILER_DIR CACHE STRING
   "Root directory of the Intel Compiler Suite (contains ipp, mkl, etc.)")
@@ -90,7 +95,7 @@ IF (INTEL_MKL_DIR)
 ENDIF (INTEL_MKL_DIR)
 
 # Try linking multiple libs
-MACRO(CHECK_ALL_LIBRARIES LIBRARIES _name _list _flags)
+MACRO(CHECK_ALL_LIBRARIES LIBRARIES _name _list _flags mkl_root_paths)
   # This macro checks for the existence of the combination of libraries given by _list.
   # If the combination is found, this macro whether we can link against that library
   # combination using the name of a routine given by _name using the linker
@@ -117,7 +122,7 @@ MACRO(CHECK_ALL_LIBRARIES LIBRARIES _name _list _flags)
   FOREACH(_library ${_list})
     SET(_combined_name ${_combined_name}_${_library})
     IF(_libraries_work)      
-      FIND_LIBRARY(${_prefix}_${_library}_LIBRARY NAMES ${_library})
+      FIND_LIBRARY(${_prefix}_${_library}_LIBRARY NAMES ${_library} HINTS ${mkl_root_paths}/lib/intel64)
       MARK_AS_ADVANCED(${_prefix}_${_library}_LIBRARY)
       SET(${LIBRARIES} ${${LIBRARIES}} ${${_prefix}_${_library}_LIBRARY})
       SET(_libraries_work ${${_prefix}_${_library}_LIBRARY})
@@ -161,7 +166,7 @@ FOREACH(mklrtl ${mklrtls} "")
       FOREACH(mklthread ${mklthreads})
         IF (NOT MKL_LIBRARIES AND NOT INTEL_MKL_SEQUENTIAL)
           CHECK_ALL_LIBRARIES(MKL_LIBRARIES cblas_sgemm
-            "mkl_${mkliface}${mkl64};${mklthread};mkl_core;${mklrtl};pthread;${mkl_m}" "")
+            "mkl_rt;mkl_${mkliface}${mkl64};${mklthread};mkl_core;${mklrtl};pthread;${mkl_m}" "" "${mkl_root_paths}")
         ENDIF (NOT MKL_LIBRARIES AND NOT INTEL_MKL_SEQUENTIAL)          
       ENDFOREACH(mklthread)
     ENDFOREACH(mkl64)
@@ -172,7 +177,7 @@ FOREACH(mklrtl ${mklrtls} "")
     FOREACH(mkl64 ${mkl64s} "")
       IF (NOT MKL_LIBRARIES)
         CHECK_ALL_LIBRARIES(MKL_LIBRARIES cblas_sgemm
-          "mkl_${mkliface}${mkl64};mkl_sequential;mkl_core;${mkl_m}" "")
+          "mkl_rt;mkl_${mkliface}${mkl64};mkl_sequential;mkl_core;${mkl_m}" "" "${mkl_root_paths}" )
         IF (MKL_LIBRARIES)
           SET(mklseq "_sequential")
         ENDIF (MKL_LIBRARIES)
@@ -186,7 +191,7 @@ FOREACH(mklrtl ${mklrtls} "")
       FOREACH(mklthread ${mklthreads})
         IF (NOT MKL_LIBRARIES)
           CHECK_ALL_LIBRARIES(MKL_LIBRARIES cblas_sgemm
-            "mkl_${mkliface}${mkl64};${mklthread};mkl_core;${mklrtl};pthread;${mkl_m}" "")
+            "mkl_rt;mkl_${mkliface}${mkl64};${mklthread};mkl_core;${mklrtl};pthread;${mkl_m}" "" "${mkl_root_paths}" )
         ENDIF (NOT MKL_LIBRARIES)          
       ENDFOREACH(mklthread)
     ENDFOREACH(mkl64)
