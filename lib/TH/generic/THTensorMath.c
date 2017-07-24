@@ -6,6 +6,7 @@
 #include <omp.h>
 #endif
 
+#include <x86intrin.h>
 #define TH_OMP_OVERHEAD_THRESHOLD 720
 
 #ifdef _OPENMP
@@ -36,7 +37,7 @@
 {\
   TYPE *TENSOR##_data = THTensor_(data)(TENSOR); \
   ptrdiff_t TENSOR##_len = THTensor_(nElement)(TENSOR); \
- CODE \
+  CODE \
 }
 
 #else
@@ -124,9 +125,7 @@
 #endif
 void THTensor_(fill)(THTensor *r_, real value)
 {
-  int contig1 = 0;
   if (THTensor_(isContiguous)(r_) || THTensor_(isTransposed)(r_)) {
-    contig1 = 1;
     TH_TENSOR_APPLY_CONTIG(real, r_, THVector_(fill)(r__data, value, r__len););
   } else {
     TH_TENSOR_APPLY(real, r_,
@@ -675,7 +674,6 @@ accreal THTensor_(sumall)(THTensor *tensor)
   int tensorContig = THTensor_(isContiguous)(tensor)? 1:0;        
   ptrdiff_t tensorSize = THTensor_(nElement)(tensor);     
 
-  
   accreal sum = 0;
 #ifdef _OPENMP
   TH_TENSOR_APPLY_REDUCTION_ADVANCED_INDEX(real, tensor, +:sum, sum += *tensor_data;);
@@ -718,6 +716,8 @@ void THTensor_(add)(THTensor *r_, THTensor *t, real value)
   } else {
     TH_TENSOR_APPLY2(real, r_, real, t, *r__data = *t_data + value;);
   }
+  
+
 }
 
 void THTensor_(sub)(THTensor *r_, THTensor *t, real value)
@@ -731,7 +731,9 @@ void THTensor_(mul)(THTensor *r_, THTensor *t, real value)
   ptrdiff_t r_Size = THTensor_(nElement)(r_);                     
   ptrdiff_t tSize = THTensor_(nElement)(t);                     
   int r_Contig = THTensor_(isContiguous)(r_)? 1:0;                 
-  int tContig = THTensor_(isContiguous)(t)? 1:0;   
+  int tContig = THTensor_(isContiguous)(t)? 1:0;
+  
+     
   if (tSize == r_Size){
     if (r_Contig && tContig) {
       TH_TENSOR_APPLY2_CONTIG(real, r_, real, t, THVector_(muls)(r__data, t_data, value, r__len););
@@ -745,6 +747,7 @@ void THTensor_(mul)(THTensor *r_, THTensor *t, real value)
   } else {
     TH_TENSOR_APPLY2(real, r_, real, t, *r__data = *t_data * value;);
   }
+  
 }
 
 void THTensor_(div)(THTensor *r_, THTensor *t, real value)
@@ -767,6 +770,8 @@ void THTensor_(div)(THTensor *r_, THTensor *t, real value)
   } else {
     TH_TENSOR_APPLY2(real, r_, real, t, *r__data = *t_data / value;);
   }
+  
+  
 }
 
 void THTensor_(lshift)(THTensor *r_, THTensor *t, real value)
@@ -1120,6 +1125,8 @@ void THTensor_(cadd)(THTensor *r_, THTensor *t, real value, THTensor *src)
   } else {
     TH_TENSOR_APPLY3(real, r_, real, t, real, src, *r__data = *t_data + value * *src_data;);  
   }
+  
+  
 }
 
 void THTensor_(csub)(THTensor *r_, THTensor *t, real value,THTensor *src)
@@ -1151,6 +1158,8 @@ void THTensor_(cmul)(THTensor *r_, THTensor *t, THTensor *src)
   } else {
       TH_TENSOR_APPLY3(real, r_, real, t, real, src, *r__data = *t_data * *src_data;);
   }
+  
+  
 }
 
 void THTensor_(cpow)(THTensor *r_, THTensor *t, THTensor *src)
@@ -1205,6 +1214,8 @@ void THTensor_(cdiv)(THTensor *r_, THTensor *t, THTensor *src)
   } else {
       TH_TENSOR_APPLY3(real, r_, real, t, real, src, *r__data = *t_data / *src_data;);
   }
+  
+  
 }
 
 void THTensor_(clshift)(THTensor *r_, THTensor *t, THTensor *src)
@@ -2258,6 +2269,7 @@ void THTensor_(sum)(THTensor *r_, THTensor *t, int dimension, int keepdim)
   THTensor_(resize)(r_, dim, NULL);
   THLongStorage_free(dim);
 
+ 
   int oldPath = 0;
   int omp_flag = omp_in_parallel();
   if(0 == omp_flag){
@@ -2285,8 +2297,8 @@ void THTensor_(sum)(THTensor *r_, THTensor *t, int dimension, int keepdim)
         r_StrideContg = 0;
         break;
       }
-        strideSomeDim *= r_->size[dim-1];
-        r_Stride[dim-1] = strideSomeDim;
+      strideSomeDim *= r_->size[dim-1];
+      r_Stride[dim-1] = strideSomeDim;
     }
 
     real *tp = THTensor_(data)(t);
@@ -3445,7 +3457,6 @@ TENSOR_IMPLEMENT_LOGICAL(ne,!=)
       TH_TENSOR_APPLY2(real, r_, real, t, *r__data = CFUNC(*t_data););                                            \
     }                                                                                                             \
   }                                                                                                               \ 
-    
   
 #else
 #define LAB_IMPLEMENT_BASIC_FUNCTION(NAME, CFUNC)                                                     \
@@ -3466,7 +3477,6 @@ TENSOR_IMPLEMENT_LOGICAL(ne,!=)
     TH_TENSOR_APPLY2(real, r_, real, t, CODE);                                                        \
   }                                                                                                   \
   
-
 #endif
 
 
@@ -3552,7 +3562,9 @@ LAB_IMPLEMENT_BASIC_FUNCTION(asin,TH_MATH_NAME(asin))
 LAB_IMPLEMENT_BASIC_FUNCTION(sinh,TH_MATH_NAME(sinh))
 LAB_IMPLEMENT_BASIC_FUNCTION(tan,TH_MATH_NAME(tan))
 LAB_IMPLEMENT_BASIC_FUNCTION(atan,TH_MATH_NAME(atan))
+#if defined (TH_REAL_IS_DOUBLE)
 LAB_IMPLEMENT_BASIC_FUNCTION(tanh,TH_MATH_NAME(tanh))
+#endif
 LAB_IMPLEMENT_BASIC_FUNCTION_VALUE(pow,TH_MATH_NAME(pow))
 LAB_IMPLEMENT_BASIC_FUNCTION(sqrt,TH_MATH_NAME(sqrt))
 LAB_IMPLEMENT_BASIC_FUNCTION(rsqrt,TH_MATH_NAME(TH_rsqrt))

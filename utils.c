@@ -277,7 +277,7 @@ void end_log1(long start_time, long size1, int contig1, const char* func_name, c
     struct timeval clock_v;
     gettimeofday(&clock_v, NULL);
     long interval = clock_v.tv_sec*1000000 + clock_v.tv_usec - start_time;
-    fprintf(fp, "time: %10ld\tsize1: %10ld\tcontig1: %2d\tfunc: %s\tfile: %s\n", interval, size1, contig1, func_name, source_file_name);   
+    fprintf(fp, "time: %10ld\tsize1: %10ld\tsize2: %10ld\tsize3: %10ld\tcontig1: %2d\tcontig2: %2d\tcontig3: %2d\tfunc: %25s\tfile: %25s\n", interval, size1, 0, 0, contig1, -1, -1, func_name, source_file_name);
   }
 }
 
@@ -287,10 +287,8 @@ void end_log2(long start_time, long size1, long size2, int contig1, int contig2,
     struct timeval clock_v;
     gettimeofday(&clock_v, NULL);
     long interval = clock_v.tv_sec*1000000 + clock_v.tv_usec - start_time;
-    fprintf(fp, "time: %10ld\tsize1: %10ld\tsize2: %10ld\tsize3: %10ld\tcontig1: %2d\tcontig2: %2d\tcontig3: %2d\tfunc: %25s\tfile: %25s\n", interval, size1, 0, 0, contig1, -1, -1, func_name, source_file_name);
-  }
-}
-
+    fprintf(fp, "time: %10ld\tsize1: %10ld\tsize2: %10ld\tsize3: %10ld\tcontig1: %2d\tcontig2: %2d\tcontig3: %2d\tfunc: %25s\tfile: %25s\n", interval, size1, size2, 0, contig1, contig2, -1, func_name, source_file_name);
+  }}
 
 void end_log3(long start_time, long size1, long size2, long size3, int contig1, int contig2, int contig3, const char* func_name, char* source_file_name)
 {

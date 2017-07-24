@@ -6,34 +6,6 @@
 #include <omp.h>
 #endif
 #include <x86intrin.h>
-void THTensor_(copy2)(THTensor *tensor, THTensor *src)
-{
-  if (THTensor_(isContiguous)(tensor) && THTensor_(isContiguous)(src) && THTensor_(nElement)(tensor) == THTensor_(nElement)(src)) {
-    real *sp = THTensor_(data)(src);
-    real *rp = THTensor_(data)(tensor);
-    ptrdiff_t sz = THTensor_(nElement)(tensor);
-#ifndef TH_REAL_IS_HALF
-    THVector_(copy)(rp, sp, sz); 
-#else
-#ifdef _OPENMP
-    ptrdiff_t i;
-    
-    #pragma omp parallel for if (sz > TH_OMP_OVERHEAD_THRESHOLD_COPY) private (i)
-    for(i=0; i<sz; i++){
-      rp[i] = sp[i];
-    }  
-#else
-    memcpy(rp, sp, sz * sizeof(real));
-#endif
-#endif
-  } else {
-#ifdef _OPENMP 
-    TH_TENSOR_APPLY2_ADVANCED_INDEX(real, tensor, real, src, *tensor_data = *src_data;)
-#else
-    TH_TENSOR_APPLY2(real, tensor, real, src, *tensor_data = *src_data;)
-#endif
-  }
-}
 
 void THTensor_(copy)(THTensor *tensor, THTensor *src)
 {
@@ -74,6 +46,7 @@ void THTensor_(copy)(THTensor *tensor, THTensor *src)
   } else {
     TH_TENSOR_APPLY2(real, tensor, real, src, *tensor_data = *src_data;)
   }
+
 }
 
 

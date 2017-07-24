@@ -196,8 +196,8 @@ void THFloatVector_fill_AVX512(float *x, const float c, const ptrdiff_t n) {
   #pragma omp parallel for if ( (n > TH_OMP_OVERHEAD_THRESHOLD_VEC_AVX512) && ( 0 == omp_flag) )private (i)  
 #endif
   for (i=0; i<=((n)-32); i+=32) {
-    _mm512_storeu_ps((x)+i, YMM0);
-    _mm512_storeu_ps((x)+i+16, YMM0);
+    _mm512_storeu_ps((x)+i , YMM0);
+    _mm512_storeu_ps((x)+i+16 , YMM0);
   }
   off = (n) - ((n)%32);
   for (i=off; i<n; i++) {
@@ -285,10 +285,9 @@ void THFloatVector_muls_AVX512(float *y, const float *x, const float c, const pt
   }
 }
 /*
-void THFloatVector_cadd_AVX512(float *z, const float *x, const float *y, const float c, const ptrdiff_t n) {
+void THFloatVector_caddS1_AVX512(float *z, const float *x, const float *y, const ptrdiff_t n) {
   ptrdiff_t i;
   ptrdiff_t off;
-  __m512 YMM15 = _mm512_set_ps(c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c);
 #ifdef _OPENMP
   int omp_flag = omp_in_parallel();
   #pragma omp parallel for if ( (n > TH_OMP_OVERHEAD_THRESHOLD_VEC_AVX512) && ( 0 == omp_flag) )private (i)  
@@ -297,13 +296,12 @@ void THFloatVector_cadd_AVX512(float *z, const float *x, const float *y, const f
     __m512 YMM0, YMM1, YMM2, YMM3;
     YMM0 = _mm512_loadu_ps(y+i);
     YMM1 = _mm512_loadu_ps(x+i);
-    YMM2 = _mm512_mul_ps(YMM0, YMM15);
-    YMM3 = _mm512_add_ps(YMM1, YMM2);
-    _mm512_storeu_ps(z+i, YMM3);
+    YMM2 = _mm512_add_ps(YMM0, YMM1);
+    _mm512_storeu_ps(z+i, YMM2);
   }
   off = (n) - ((n)%16);
   for (i=off; i<(n); i++) {
-    z[i] = x[i] + y[i] * c;
+    z[i] = x[i] + y[i];
   }
 }
 */
@@ -349,7 +347,6 @@ void THDoubleVector_cadd_AVX512(double *z, const double *x, const double *y, con
 }
 
 void THFloatVector_cadd_AVX512(float *z, const float *x, const float *y, const float c, const ptrdiff_t n) {
-  //if (abs(c-1.f) > 1e-10) {
     ptrdiff_t i;
     ptrdiff_t off;
     __m512 YMM15 = _mm512_set_ps(c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c);
@@ -369,49 +366,6 @@ void THFloatVector_cadd_AVX512(float *z, const float *x, const float *y, const f
     for (i=off; i<(n); i++) {
       z[i] = x[i] + y[i] * c;
     }
-  /*} else {
-    ptrdiff_t i;
-    ptrdiff_t off;
-#ifdef _OPENMP
-    int omp_flag = omp_in_parallel();
-    #pragma omp parallel for if ( (n > TH_OMP_OVERHEAD_THRESHOLD_VEC_AVX512) && ( 0 == omp_flag) )private (i) 
-#endif
-    for (i=0; i<=((n)-16); i+=16) {
-      __m512 YMM0, YMM1;
-      YMM0 = _mm512_loadu_ps(y+i);
-      YMM1 = _mm512_loadu_ps(x+i);
-      YMM1 = _mm512_add_ps(YMM0, YMM1);
-      _mm512_storeu_ps(z+i, YMM1);
-
-    }
-    off = (n) - ((n)%16);
-    for (i=off; i<(n); i++) {
-      z[i] = x[i] + y[i];
-    }
-  }*/
 }
 
-/*
-void THFloatVector_cadd_AVX512(float *z, const float *x, const float *y, const float c, const ptrdiff_t n) {
-  ptrdiff_t i;
-  ptrdiff_t off;
-  __m512 YMM15 = _mm512_set_ps(c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c);
-#ifdef _OPENMP
-  int omp_flag = omp_in_parallel();
-  #pragma omp parallel for if ( (n > TH_OMP_OVERHEAD_THRESHOLD_VEC_AVX512) && ( 0 == omp_flag) )private (i) 
-#endif
-  for (i=0; i<=((n)-16); i+=16) {
-    __m512 YMM0, YMM1;
-    YMM0 = _mm512_loadu_ps(y+i);
-    YMM1 = _mm512_loadu_ps(x+i);
-    YMM1 = _mm512_fmadd_ps(YMM0, YMM15, YMM1);
-    _mm512_storeu_ps(z+i, YMM1);
-
-  }
-  off = (n) - ((n)%16);
-  for (i=off; i<(n); i++) {
-    z[i] = x[i] + y[i] * c;
-  }
-}
-*/
 #endif // defined(__AVX512__)
