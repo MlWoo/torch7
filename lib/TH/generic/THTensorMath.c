@@ -122,6 +122,7 @@
   CODE \
 }
 #endif
+
 void THTensor_(fill)(THTensor *r_, real value)
 {
   int contig1 = 0;
@@ -747,7 +748,14 @@ void THTensor_(mul)(THTensor *r_, THTensor *t, real value)
   }
 }
 
+
 void THTensor_(div)(THTensor *r_, THTensor *t, real value)
+{
+  real inv = 1.f/value;
+  THTensor_(mul)(r_, t, inv);
+}
+
+void THTensor_(div2)(THTensor *r_, THTensor *t, real value)
 {
   THTensor_(resizeAs)(r_, t);
   ptrdiff_t r_Size = THTensor_(nElement)(r_);                     
@@ -1132,7 +1140,7 @@ void THTensor_(cmul)(THTensor *r_, THTensor *t, THTensor *src)
   THTensor_(resizeAs)(r_, t);
   ptrdiff_t r_Size = THTensor_(nElement)(r_);                     
   ptrdiff_t srcSize = THTensor_(nElement)(src);
-  ptrdiff_t	tSize = THTensor_(nElement)(t);   
+  ptrdiff_t tSize = THTensor_(nElement)(t);   
 
                        
   int r_Contig = THTensor_(isContiguous)(r_)? 1:0;                 
@@ -2685,9 +2693,6 @@ void THTensor_(randperm)(THTensor *r_, THGenerator *_generator, long n)
   for(i = 0; i < n; i++)
     r__data[i*r__stride_0] = (real)(i);
     
-#ifdef _OPENMP
-  #pragma omp parallel for if ( (n > TH_OMP_OVERHEAD_THRESHOLD) && ( 0 == omp_flag) )private (i)  
-#endif
   for(i = 0; i < n-1; i++)
   {
     long z = THRandom_random(_generator) % (n-i);
