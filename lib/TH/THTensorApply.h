@@ -181,8 +181,7 @@
 #define THTENSOR_MAX_DIM 64
 #define TH_OMP_OVERHEAD_THRESHOLD_COPY 1000 
 #include <x86intrin.h>
-
-extern ptrdiff_t SearchingIndex(ptrdiff_t index, long *stride, long dim, long* strideBySize);
+#include "general.h"
 
 #define TH_TENSOR_APPLY_REDUCTION_ADVANCED_INDEX(TYPE1, TENSOR1, OPERATION, CODE) \
 {                                                                               \

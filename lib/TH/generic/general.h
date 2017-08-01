@@ -1,5 +1,5 @@
-#ifndef RANDOM_H
-#define RANDOM_H
+#ifndef GENERAL_H
+#define GENERAL_H
 typedef unsigned long RNG;
 
 inline RNG RNGInit(long seed)
