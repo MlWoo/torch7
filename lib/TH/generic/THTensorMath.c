@@ -1894,109 +1894,21 @@ void THTensor_(addr)(THTensor *r_, real beta, THTensor *t, real alpha, THTensor 
                  THTensor_(data)(vec1), vec1->stride[0],
                  THTensor_(data)(r_), r_->stride[0]);
     }    
-    else if (sizeof(real) == sizeof(float)){
-#ifdef FORCE_AVX512
+    else {
       ptrdiff_t i; 
       const ptrdiff_t m = vec1->size[0];
       const ptrdiff_t n = vec2->size[0];
-      const float* x = (float*)THTensor_(data)(vec1);
-      const float* y = (float*)THTensor_(data)(vec2);
-      const ptrdiff_t off = (n) - ((n)%16);
+      const real* x = (real*)THTensor_(data)(vec1);
+      const real* y = (real*)THTensor_(data)(vec2);
       #pragma omp parallel for
       for (i=0; i<m; ++i) {
-        float* temp_z = (float*)THTensor_(data)(r_) + i*n;
-        const float c = x[i]*alpha;
-        __m512 YMM15 = _mm512_set1_ps(c); 
-        __m512 YMM0, YMM1;
+        real* temp_z = (real*)THTensor_(data)(r_) + i*n;
+        const real c = x[i]*alpha;
         ptrdiff_t j; 
-        for (j=0; j<=((n)-16); j+=16) {
-          YMM0 = _mm512_loadu_ps(y+j);
-          YMM1 = _mm512_loadu_ps(temp_z+j);
-          YMM1 = _mm512_fmadd_ps(YMM0, YMM15, YMM1);       
-          _mm512_storeu_ps(temp_z+j, YMM1);
-        }
-        for (j=off; j<(n); ++j) { 
-          temp_z[j] = temp_z[j] + y[j] * c;  
+        for (j=0; j<(n); ++j) { 
+          temp_z[j] += y[j] * c;  
         }
       }
-#else
-      ptrdiff_t i; 
-      const ptrdiff_t m = vec1->size[0];
-      const ptrdiff_t n = vec2->size[0];
-      const float* x = (float*)THTensor_(data)(vec1);
-      const float* y = (float*)THTensor_(data)(vec2);
-      const ptrdiff_t off = (n) - ((n)%8);
-      #pragma omp parallel for
-      for (i=0; i<m; ++i) {
-        float* temp_z = (float*)THTensor_(data)(r_) + i*n;
-        const float c = x[i]*alpha;
-        __m256 YMM15 = _mm256_set1_ps(c); 
-        __m256 YMM0, YMM1;
-        ptrdiff_t j; 
-        for (j=0; j<=((n)-8); j+=8) {
-          YMM0 = _mm256_loadu_ps(y+j);
-          YMM1 = _mm256_loadu_ps(temp_z+j);
-          YMM1 = _mm256_fmadd_ps(YMM0, YMM15, YMM1);       
-          _mm256_storeu_ps(temp_z+j, YMM1);
-        }
-        for (j=off; j<(n); ++j) { 
-          temp_z[j] = temp_z[j] + y[j] * c;  
-        }
-      }
-
-
-#endif     
-    }   
-    else{
-#ifdef FORCE_AVX512
-      ptrdiff_t i; 
-      const ptrdiff_t m = vec1->size[0];
-      const ptrdiff_t n = vec2->size[0];
-      const double* x = (double*)THTensor_(data)(vec1);
-      const double* y = (double*)THTensor_(data)(vec2);
-      const ptrdiff_t off = (n) - ((n)%8);
-      #pragma omp parallel for 
-      for (i=0; i<m; ++i){ 
-        double* temp_z = (double*)THTensor_(data)(r_) + i*n;
-        const double c = x[i] * alpha;
-        __m512d YMM15 = _mm512_set1_pd(c); 
-        __m512d YMM0, YMM1;
-        ptrdiff_t j; 
-        for (j=0; j<=((n)-8); j+=8) {
-          YMM0 = _mm512_loadu_pd(y+j);
-          YMM1 = _mm512_loadu_pd(temp_z+j);
-          YMM1 = _mm512_fmadd_pd(YMM0, YMM15, YMM1);       
-          _mm512_storeu_pd(temp_z+j, YMM1);
-        }
-        for (j=off; j<(n); ++j) { 
-          temp_z[j] = temp_z[j] + y[j] * c;  
-        }
-      }
-#else
-      ptrdiff_t i; 
-      const ptrdiff_t m = vec1->size[0];
-      const ptrdiff_t n = vec2->size[0];
-      const double* x = (double*)THTensor_(data)(vec1);
-      const double* y = (double*)THTensor_(data)(vec2);
-      const ptrdiff_t off = (n) - ((n)%4);
-      #pragma omp parallel for 
-      for (i=0; i<m; ++i){ 
-        double* temp_z = (double*)THTensor_(data)(r_) + i*n;
-        const double c = x[i] * alpha;
-        __m256d YMM15 = _mm256_set1_pd(c); 
-        __m256d YMM0, YMM1;
-        ptrdiff_t j; 
-        for (j=0; j<=((n)-4); j+=4) {
-          YMM0 = _mm256_loadu_pd(y+j);
-          YMM1 = _mm256_loadu_pd(temp_z+j);
-          YMM1 = _mm256_fmadd_pd(YMM0, YMM15, YMM1);       
-          _mm256_storeu_pd(temp_z+j, YMM1);
-        }
-        for (j=off; j<(n); ++j) { 
-          temp_z[j] = temp_z[j] + y[j] * c;  
-        }
-      }
-#endif    
     }   
   }
   else
@@ -3442,7 +3354,7 @@ TENSOR_IMPLEMENT_LOGICAL(ne,!=)
     else {                                                                                                        \
       TH_TENSOR_APPLY2(real, r_, real, t, *r__data = CFUNC(*t_data););                                            \
     }                                                                                                             \
-  }                                                                                                               \ 
+  }                                                                                                               \
     
   
 #else

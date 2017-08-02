@@ -3,6 +3,7 @@
 #include "THVector.h"
 #include "generic/simd/simd.h"
 
+#include "general_func.h"
 #include "THBlas.h"
 #include "THLapack.h"
 #include "THRandom.h"

@@ -399,6 +399,7 @@ INSTALL(TARGETS TH
   ARCHIVE DESTINATION "${TH_INSTALL_LIB_SUBDIR}")
 
 INSTALL(FILES
+  general_func.h
   TH.h
   THAllocator.h
   THMath.h
@@ -461,7 +462,6 @@ INSTALL(FILES
   generic/THTensorRandom.h
   generic/THVectorDispatch.c
   generic/THVector.h
-  generic/general.h
   DESTINATION "${TH_INSTALL_INCLUDE_SUBDIR}/TH/generic")
 
 
