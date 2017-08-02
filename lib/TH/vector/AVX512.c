@@ -1,4 +1,4 @@
-#if defined(__AVX2__)
+#if defined(__AVX512F__)
 #ifndef _MSC_VER
 #include <x86intrin.h>
 #else
