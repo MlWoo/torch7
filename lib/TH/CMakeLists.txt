@@ -435,6 +435,7 @@ INSTALL(FILES
 INSTALL(FILES
   vector/AVX.h
   vector/AVX2.h
+  vector/AVX512.h
   DESTINATION "${TH_INSTALL_INCLUDE_SUBDIR}/TH/vector")
 
 INSTALL(FILES
@@ -460,6 +461,7 @@ INSTALL(FILES
   generic/THTensorRandom.h
   generic/THVectorDispatch.c
   generic/THVector.h
+  generic/general.h
   DESTINATION "${TH_INSTALL_INCLUDE_SUBDIR}/TH/generic")
 
 
