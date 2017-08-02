@@ -202,7 +202,7 @@ ENDFOREACH(mklrtl)
 IF (NOT MKL_LIBRARIES)
   SET(MKL_VERSION 900)
   CHECK_ALL_LIBRARIES(MKL_LIBRARIES cblas_sgemm
-    "mkl;guide;pthread;m" "")
+    "mkl;guide;pthread;m" "" "${mkl_root_paths}")
 ENDIF (NOT MKL_LIBRARIES)          
 
 # Include files
