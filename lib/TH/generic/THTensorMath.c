@@ -749,13 +749,13 @@ void THTensor_(mul)(THTensor *r_, THTensor *t, real value)
 }
 
 
-void THTensor_(div)(THTensor *r_, THTensor *t, real value)
+void THTensor_(div2)(THTensor *r_, THTensor *t, real value)
 {
   real inv = 1.f/value;
   THTensor_(mul)(r_, t, inv);
 }
 
-void THTensor_(div2)(THTensor *r_, THTensor *t, real value)
+void THTensor_(div)(THTensor *r_, THTensor *t, real value)
 {
   THTensor_(resizeAs)(r_, t);
   ptrdiff_t r_Size = THTensor_(nElement)(r_);                     
