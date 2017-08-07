@@ -2685,9 +2685,6 @@ void THTensor_(randperm)(THTensor *r_, THGenerator *_generator, long n)
   for(i = 0; i < n; i++)
     r__data[i*r__stride_0] = (real)(i);
     
-#ifdef _OPENMP
-  #pragma omp parallel for if ( (n > TH_OMP_OVERHEAD_THRESHOLD) && ( 0 == omp_flag) )private (i)  
-#endif
   for(i = 0; i < n-1; i++)
   {
     long z = THRandom_random(_generator) % (n-i);
