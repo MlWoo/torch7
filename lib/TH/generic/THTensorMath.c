@@ -272,23 +272,24 @@ void THTensor_(indexCopyDetail)(THTensor *tensor, int dimIndex, THTensor *src)
   long innerIter = 1;
   long i = 0; 
   for (i = 0; i < dimIndex; i++) //in 3, max 3 .iter 3
-  {   
+  {
     outIter *= src->size[i];
   }
   for (i = src->nDimension-1; i > dimIndex-1; i--) // ndim 3,ndim-1=2, dimInd=2, start 2 end 2
-  {   
+  {
     innerIter *= src->size[i];
   }
 
   long j = 0;
   long srcOuterStride = src->stride[dimIndex-1];
   long tensorOuterStride = tensor->stride[dimIndex-1];
-  #pragma omp parallel for if(outIter > TH_OMP_OVERHEAD_THRESHOLD) 
+
   for(i = 0; i < outIter; i++)
   {
     #pragma ivdep
+    #pragma omp parallel for if(outIter > TH_OMP_OVERHEAD_THRESHOLD) 
     for(j = 0; j < innerIter; j++)
-    {   
+    {
       rp[j] = tp[j];
     }
     tp += srcOuterStride;
